@@ -6,10 +6,10 @@
 
 (define (primitive-predicate name data-test)
   (if (not (predicate? data-test))
-      (register-predicate! data-test (symbol 'n: name)))
+    (register-predicate! data-test (symbol 'n: name)))
   (let ((predicate
-         (make-simple-predicate name data-test
-                                tagging-strategy:optional)))
+          (make-simple-predicate name data-test
+                                 tagging-strategy:optional)))
     (set-predicate<=! data-test predicate)
     predicate))
 
@@ -92,13 +92,13 @@
       (cond ((eq? object #t) boolean-tag)
             ((eq? object '()) null-tag)
             (else
-             (let ((name (implementation-type-name object)))
-               (hash-table-intern! %object-tag-map name
-                 (lambda ()
-                   (predicate->tag
-                    (register-predicate!
-                     (implementation-type-predicate name)
-                     name))))))))))
+              (let ((name (implementation-type-name object)))
+                (hash-table-intern! %object-tag-map name
+                                    (lambda ()
+                                      (predicate->tag
+                                        (register-predicate!
+                                          (implementation-type-predicate name)
+                                          name))))))))))
 
 (define (%predefine-tags predicate name . type-names)
   (for-each (lambda (type-name)

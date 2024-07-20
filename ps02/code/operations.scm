@@ -35,11 +35,11 @@
 ;;; API
 (define (constant-union name . constants)
   (let ((unique
-         (remove default-object?
-                 (delete-duplicates constants eqv?))))
+          (remove default-object?
+                  (delete-duplicates constants eqv?))))
     (if (n:pair? unique)
-        (car unique)
-        (default-object))))
+      (car unique)
+      (default-object))))
 
 ;;; API
 (define (operation-union operator . operations)
@@ -49,7 +49,7 @@
 (define (operation-union* operator operations)
   (make-operation operator
                   (applicability-union*
-                   (map operation-applicability operations))
+                    (map operation-applicability operations))
                   (lambda args
                     (operation-union-dispatch operator
                                               operations
@@ -58,11 +58,11 @@
 ;; helper to make book description clearer
 (define (operation-union-dispatch operator operations args)
   (let ((operation
-         (find (lambda (operation)
-                 (is-operation-applicable? operation args))
-               operations)))
+          (find (lambda (operation)
+                  (is-operation-applicable? operation args))
+                operations)))
     (if (not operation)
-        (error "Inapplicable operation:" operator args))
+      (error "Inapplicable operation:" operator args))
     (apply-operation operation args)))
 
 ;; helper to make book description clearer

@@ -27,37 +27,37 @@
   (let ((record (make-operator-record arity)))
     (define (find-branch tree arg win)
       (let loop ((tree tree))
-	(cond ((pair? tree)
-	       (or (and ((caar tree) arg)
-			(win (cdar tree)))
-		   (loop (cdr tree))))
-	      ((null? tree) #f)
-	      (else tree))))
+        (cond ((pair? tree)
+               (or (and ((caar tree) arg)
+                        (win (cdar tree)))
+                   (loop (cdr tree))))
+              ((null? tree) #f)
+              (else tree))))
     (define (identity x) x)
     (define (find-handler arguments)
       (let loop ((tree (operator-record-tree record))
-		 (args arguments))
-	(find-branch tree (car args)
-	  (if (pair? (cdr args))
-	      (lambda (branch) (loop branch (cdr args)))
-	      identity))))
+                 (args arguments))
+        (find-branch tree (car args)
+                     (if (pair? (cdr args))
+                       (lambda (branch) (loop branch (cdr args)))
+                       identity))))
     (define (operator . arguments)
       (if (not (acceptable-arglist? arguments arity))
-	  (error:wrong-number-of-arguments
-	   (if (default-object? name) operator name) arity arguments))
+        (error:wrong-number-of-arguments
+          (if (default-object? name) operator name) arity arguments))
       (apply (find-handler arguments) arguments))
 
     (set-operator-record! operator record)
     (if (not (default-object? name))
-	(set-operator-record! name record))
+      (set-operator-record! name record))
 
     (set! default-operation
       (if (default-object? default-operation)
-	  (named-lambda (no-handler . arguments)
-	    (error "Generic operator inapplicable:"
-		   (if (default-object? name) operator name)
-		   arguments))
-	  default-operation))
+        (named-lambda (no-handler . arguments)
+                      (error "Generic operator inapplicable:"
+                             (if (default-object? name) operator name)
+                             arguments))
+        default-operation))
     (assign-operation operator default-operation)
 
     operator))
@@ -79,26 +79,26 @@
 (define (acceptable-arglist? lst arity)
   (let ((len (length lst)))
     (and (fix:<= (procedure-arity-min arity) len)
-	 (or (not (procedure-arity-max arity))
-	     (fix:>= (procedure-arity-max arity) len)))))
+         (or (not (procedure-arity-max arity))
+             (fix:>= (procedure-arity-max arity) len)))))
 
 (define (assign-operation operator handler . argument-predicates)
   (let ((record (get-operator-record operator))
-	(arity (length argument-predicates)))
+        (arity (length argument-predicates)))
     (if record
-	(begin
-	  (if (not (<= arity (procedure-arity-min
-			      (operator-record-arity record))))
-	      (error "Incorrect operator arity:" operator))
-	  (bind-in-tree
-	   argument-predicates
-	   handler
-	   (operator-record-tree record)
-	   (lambda (new)
-	     (set-operator-record-tree! record new))
-	   operator))
-	(error "Assigning a handler to an undefined generic operator"
-	       operator)))
+      (begin
+        (if (not (<= arity (procedure-arity-min
+                             (operator-record-arity record))))
+          (error "Incorrect operator arity:" operator))
+        (bind-in-tree
+          argument-predicates
+          handler
+          (operator-record-tree record)
+          (lambda (new)
+            (set-operator-record-tree! record new))
+          operator))
+      (error "Assigning a handler to an undefined generic operator"
+             operator)))
   operator)
 
 (define defhandler assign-operation)
@@ -106,44 +106,44 @@
 (define (bind-in-tree keys handler tree replace! operator)
   (let loop ((keys keys) (tree tree) (replace! replace!))
     (if (pair? keys)
-	;; There are argument predicates left
-	(let find-key ((tree* tree))
-	  (if (pair? tree*)
-	      (if (eq? (caar tree*) (car keys))
-		  ;; There is already some discrimination list keyed
-		  ;; by this predicate: adjust it according to the
-		  ;; remaining keys
-		  (loop (cdr keys)
-			(cdar tree*)
-			(lambda (new)
-			  (set-cdr! (car tree*) new)))
-		  (find-key (cdr tree*)))
-	      (let ((better-tree
-		     (cons (cons (car keys) '()) tree)))
-		;; There was no entry for the key I was looking for.
-		;; Create it at the head of the alist and try again.
-		(replace! better-tree)
-		(loop keys better-tree replace!))))
-	;; Ran out of argument predicates
-	(if (pair? tree)
-	    ;; There is more discrimination list here, because my
-	    ;; predicate list is a proper prefix of the predicate list
-	    ;; of some previous assign-operation.  Insert the handler
-	    ;; at the end, causing it to implicitly accept any
-	    ;; arguments that fail all available tests.
-	    (let ((p (last-pair tree)))
-	      (if (not (null? (cdr p)))
-		  (warn "Replacing a default handler:" operator (cdr p) handler))
-	      (set-cdr! p handler))
-	    (begin
-	      ;; There is no discrimination list here, because my
-	      ;; predicate list is not the proper prefix of that of
-	      ;; any previous assign-operation.  This handler becomes
-	      ;; the discrimination list, accepting further arguments
-	      ;; if any.
-	      (if (not (null? tree))
-		  (warn "Replacing a handler:" operator tree handler))
-	      (replace! handler))))))
+      ;; There are argument predicates left
+      (let find-key ((tree* tree))
+        (if (pair? tree*)
+          (if (eq? (caar tree*) (car keys))
+            ;; There is already some discrimination list keyed
+            ;; by this predicate: adjust it according to the
+            ;; remaining keys
+            (loop (cdr keys)
+                  (cdar tree*)
+                  (lambda (new)
+                    (set-cdr! (car tree*) new)))
+            (find-key (cdr tree*)))
+          (let ((better-tree
+                  (cons (cons (car keys) '()) tree)))
+            ;; There was no entry for the key I was looking for.
+            ;; Create it at the head of the alist and try again.
+            (replace! better-tree)
+            (loop keys better-tree replace!))))
+      ;; Ran out of argument predicates
+      (if (pair? tree)
+        ;; There is more discrimination list here, because my
+        ;; predicate list is a proper prefix of the predicate list
+        ;; of some previous assign-operation.  Insert the handler
+        ;; at the end, causing it to implicitly accept any
+        ;; arguments that fail all available tests.
+        (let ((p (last-pair tree)))
+          (if (not (null? (cdr p)))
+            (warn "Replacing a default handler:" operator (cdr p) handler))
+          (set-cdr! p handler))
+        (begin
+          ;; There is no discrimination list here, because my
+          ;; predicate list is not the proper prefix of that of
+          ;; any previous assign-operation.  This handler becomes
+          ;; the discrimination list, accepting further arguments
+          ;; if any.
+          (if (not (null? tree))
+            (warn "Replacing a handler:" operator tree handler))
+          (replace! handler))))))
 
 #|
 ;;; Demonstration of handler tree structure.
@@ -164,21 +164,21 @@
 (defhandler foo 'two-arg-b-c 'b 'c)
 (pp (get-operator-record foo))
 (3 (b (c . two-arg-b-c))
-   (a (c . two-arg-a-c) (b . two-arg-a-b))
-   . foo-default)
+ (a (c . two-arg-a-c) (b . two-arg-a-b))
+ . foo-default)
 
 (defhandler foo 'one-arg-b 'b)
 (pp (get-operator-record foo))
 (3 (b (c . two-arg-b-c) . one-arg-b)
-   (a (c . two-arg-a-c) (b . two-arg-a-b))
-   . foo-default)
+ (a (c . two-arg-a-c) (b . two-arg-a-b))
+ . foo-default)
 
 (defhandler foo 'one-arg-a 'a)
 (pp (get-operator-record foo))
 (3 (b (c . two-arg-b-c) . one-arg-b)
-   (a (c . two-arg-a-c) (b . two-arg-a-b) . one-arg-a)
-   .
-   foo-default)
+ (a (c . two-arg-a-c) (b . two-arg-a-b) . one-arg-a)
+ .
+ foo-default)
 
 (defhandler foo 'one-arg-a-prime 'a)
 ;Warning: Replacing a default handler: one-arg-a one-arg-a-prime
@@ -189,8 +189,8 @@
 (defhandler foo 'three-arg-x-y-z 'x 'y 'z)
 (pp (get-operator-record foo))
 (3 (x (y (z . three-arg-x-y-z)))
-   (b (c . two-arg-b-c) . one-arg-b)
-   (a (c . two-arg-a-c) (b . two-arg-a-b-prime) . one-arg-a-prime)
-   .
-   foo-default)
+ (b (c . two-arg-b-c) . one-arg-b)
+ (a (c . two-arg-a-c) (b . two-arg-a-b-prime) . one-arg-a-prime)
+ .
+ foo-default)
 |#

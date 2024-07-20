@@ -6,9 +6,9 @@
 (define (setup-time-sharing thunk)
   (set! user-continuation thunk)
   (call-with-current-continuation
-   (lambda (k)
-     (set! root-continuation k)
-     (start-time-sharing)))
+    (lambda (k)
+      (set! root-continuation k)
+      (start-time-sharing)))
   ;; note: when time-sharing terminates the 
   ;;user continuation is run again. 
   (user-continuation))
@@ -26,18 +26,18 @@
   (set! time-sharing? time-sharing-enabled?)
   (define (setup-interrupt)
     (if time-sharing?
-        (register-timer-event time-sharing:quantum on-interrupt)))
+      (register-timer-event time-sharing:quantum on-interrupt)))
   (define (on-interrupt)
     (call-with-current-continuation
-     (lambda (worker-continuation)
-       (define (grab-a-continuation)
-         (atomically
-          (lambda ()
-            (queue:add-to-end!
-             runnable-actors worker-continuation))))
-       (grab-a-continuation)
-       (setup-interrupt)		; Recursive interrupt setup
-       (root-continuation 'go))))
+      (lambda (worker-continuation)
+        (define (grab-a-continuation)
+          (atomically
+            (lambda ()
+              (queue:add-to-end!
+                runnable-actors worker-continuation))))
+        (grab-a-continuation)
+        (setup-interrupt)		; Recursive interrupt setup
+        (root-continuation 'go))))
   (setup-interrupt)			; Initialize interrupt
   )
 
@@ -52,12 +52,12 @@
 
 (define (double-check-lock check do if-not)
   (let ((outside
-	 (atomically
-	  (lambda ()
-	    (if (check)
-		(begin (do)
-		       (lambda () 'ok))
-		if-not)))))
+          (atomically
+            (lambda ()
+              (if (check)
+                (begin (do)
+                       (lambda () 'ok))
+                if-not)))))
     (outside)))
 
 
@@ -65,8 +65,8 @@
   (let ((done #f))
     (lambda (todo)
       (without-interrupts
-	(lambda ()
-	  (if (not done)
-	      (begin (set! done #t)
-		     todo)
-	      (lambda () #f)))))))
+        (lambda ()
+          (if (not done)
+            (begin (set! done #t)
+                   todo)
+            (lambda () #f)))))))

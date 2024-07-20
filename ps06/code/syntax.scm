@@ -41,15 +41,15 @@
 
 (define (definition-variable defn)
   (if (variable? (cadr defn))			;;   (DEFINE  foo      ...)
-      (cadr  defn)
-      (caadr defn)))				;;   (DEFINE (foo ...) ...)
+    (cadr  defn)
+    (caadr defn)))				;;   (DEFINE (foo ...) ...)
 
 (define (definition-value defn)
   (if (variable? (cadr defn))			;;   (DEFINE  foo        ...)
-      (caddr defn)
-      (cons 'lambda				;;   (DEFINE (foo p...) b...)
-            (cons (cdadr defn)			;; = (DEFINE  foo
-                  (cddr  defn)))))		;;     (LAMBDA (p...) b...))
+    (caddr defn)
+    (cons 'lambda				;;   (DEFINE (foo p...) b...)
+          (cons (cdadr defn)			;; = (DEFINE  foo
+                (cddr  defn)))))		;;     (LAMBDA (p...) b...))
 
 ;;; LAMBDA expressions
 
@@ -64,8 +64,8 @@
 
 (define (parameter-name var-decl)
   (if (pair? var-decl)
-      (car var-decl)
-      var-decl))
+    (car var-decl)
+    var-decl))
 
 (define (lazy? var-decl)
   (and (pair? var-decl)
@@ -79,9 +79,9 @@
 
 (define (sequence->begin seq)
   (cond ((null? seq) seq)
-	((null? (cdr seq)) (car seq))
-	((begin? (car seq)) seq)
-	(else (make-begin seq))))
+        ((null? (cdr seq)) (car seq))
+        ((begin? (car seq)) seq)
+        (else (make-begin seq))))
 
 (define (make-begin exp) (cons 'begin exp))
 
@@ -95,8 +95,8 @@
 
 (define (if-alternative exp)
   (if (not (null? (cdddr exp)))
-      (cadddr exp)
-      'the-unspecified-value))
+    (cadddr exp)
+    'the-unspecified-value))
 
 (define (make-if pred conseq alternative)
   (list 'IF pred conseq alternative))
@@ -120,16 +120,16 @@
 (define (cond->if cond-exp)
   (define (expand clauses)
     (cond ((no-clauses? clauses)
-	   (error "COND: no values matched"))
-	  ((else-clause? (car clauses))
-	   (if (no-clauses? (cdr clauses))
-	       (actions (car clauses))
-	       (error "COND: ELSE not last"
-                      cond-exp)))
-	  (else
-	   (make-if (predicate (car clauses))
-		    (actions (car clauses))
-		    (expand (cdr clauses))))))
+           (error "COND: no values matched"))
+          ((else-clause? (car clauses))
+           (if (no-clauses? (cdr clauses))
+             (actions (car clauses))
+             (error "COND: ELSE not last"
+                    cond-exp)))
+          (else
+            (make-if (predicate (car clauses))
+                     (actions (car clauses))
+                     (expand (cdr clauses))))))
   (expand (clauses cond-exp)))
 
 
@@ -152,10 +152,10 @@
 (define (let-body let-exp) (sequence->begin (cddr let-exp)))
 (define (let->combination let-exp)
   (let ((names (let-bound-variables let-exp))
-	(values (let-values let-exp))
-	(body (let-body let-exp)))
+        (values (let-values let-exp))
+        (body (let-body let-exp)))
     (cons (list 'LAMBDA names body)
-	  values)))
+          values)))
 
 ;;; Procedure applications -- NO-ARGS? and LAST-OPERAND? added
 

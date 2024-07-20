@@ -105,9 +105,9 @@ The order of growth in space is O(b).
       (mod* x x))
     (define (em base exponent)
       (cond ((= exponent 0) 1)
-	    ((= exponent 1) (modulo base p))
-	    (else (mod* (em (square base) (quotient exponent 2))
-		     (em base (remainder exponent 2))))))
+            ((= exponent 1) (modulo base p))
+            (else (mod* (em (square base) (quotient exponent 2))
+                        (em base (remainder exponent 2))))))
     em))
 
 ; a^b = (a^2)^(floor(b/2)) * a^(b % 2)
@@ -140,9 +140,9 @@ This is a recursive algorithm.
 (define (random-k-digit-number k)
   (define (append-random-digits n k)
     (if (= k 0) 
-	n
-	(append-random-digits (+ (* n 10) (random 10))
-			      (- k 1))))
+      n
+      (append-random-digits (+ (* n 10) (random 10))
+                            (- k 1))))
   (append-random-digits 0 k))
 
 
@@ -172,8 +172,8 @@ This is a recursive algorithm.
 (define (count-digits n)
   (define (count-digits-iter n d)
     (if (= n 0)
-	d
-	(count-digits-iter (quotient n 10) (+ d 1))))
+      d
+      (count-digits-iter (quotient n 10) (+ d 1))))
   (count-digits-iter n 0))
 
 
@@ -194,8 +194,8 @@ This is a recursive algorithm.
 (define (big-random n)
   (define (check r)
     (if (< r n)
-	r
-	(big-random n)))
+      r
+      (big-random n)))
   (check (random-k-digit-number (count-digits n))))
 
 
@@ -234,18 +234,18 @@ This is a recursive algorithm.
 
 #|
 (a) Order of growth in time: (O n)  [by this I mean what would commonly be written as O(n), but I want to use prefix notation here!]. This is because the program has to check each integer k, where 2 <= k <= n, and determine if k is a factor of n. Assuming that (remainder k n) is a constant-time operation with respect to k and n (which is probably not quite true, but likely to be small, perhaps logarithmic in n), then we can see that `remainder' will be called up to n times.
-    Order of growth in space: (O 1).
-       This is because the process evolves as follows:
-        (slow-prime? 5)
-        (test-factors 5 2)
-        (test-factors 5 3)
-        (test-factors 5 4)
-        (test-factors 5 5)
-        #t
- 
-      The process just replaces k each time with (+ k 1), so there is no need for extra space to be used other than that used to make the original call to `test-factors'.
+Order of growth in space: (O 1).
+This is because the process evolves as follows:
+(slow-prime? 5)
+(test-factors 5 2)
+(test-factors 5 3)
+(test-factors 5 4)
+(test-factors 5 5)
+#t
 
-     slow-prime? uses an iterative algorithm.
+The process just replaces k each time with (+ k 1), so there is no need for extra space to be used other than that used to make the original call to `test-factors'.
+
+slow-prime? uses an iterative algorithm.
 
 (b) Ben's suggestion of only checking factors less than or equal to (sqrt n) would make the order of growth in time be (O (sqrt n)).
 
@@ -257,16 +257,16 @@ This is a recursive algorithm.
 
 (define (from-a-to-b a b)
   (cond
-   ((< a b) (cons a (from-a-to-b (+ a 1) b)))
-   ((= a b) (list b))
-   (else '())))
+    ((< a b) (cons a (from-a-to-b (+ a 1) b)))
+    ((= a b) (list b))
+    (else '())))
 
 (define (fermat-check-all-cases p)
   (let ((expt-p (exptmod p)))
     (map (lambda (a)
-	   (= a
-	      (expt-p a p)))
-	 (from-a-to-b 0 (- p 1)))))
+           (= a
+              (expt-p a p)))
+         (from-a-to-b 0 (- p 1)))))
 
 
 (fermat-check-all-cases 5)
@@ -288,16 +288,16 @@ This is a recursive algorithm.
 (define prime-test-iterations 20)
 
 (define prime?-iter
-      (lambda (p n-iter)
-	(cond
-	 ((< p 2) #f)
-	 ((<= n-iter 0) #t)
-	 (else
-	    (let ((a (big-random (- p 1))))
-	      (if (= ((exptmod p) a p) a)
-		  (prime?-iter p (- n-iter 1))
-		  #f))))))
-	    
+  (lambda (p n-iter)
+    (cond
+      ((< p 2) #f)
+      ((<= n-iter 0) #t)
+      (else
+        (let ((a (big-random (- p 1))))
+          (if (= ((exptmod p) a p) a)
+            (prime?-iter p (- n-iter 1))
+            #f))))))
+
 
 (define prime?
   (lambda (p)
@@ -351,8 +351,8 @@ This is a recursive algorithm.
   (lambda (k)
     (let ((n (random-k-digit-number k)))
       (if (prime? n)
-	  n
-	  (random-k-digit-prime k)))))
+        n
+        (random-k-digit-prime k)))))
 
 ; Types of failure:
 ;   - getting unlucky and either taking a long time or never returning at all, due to the random numbers generated repeatedly being composite
@@ -396,12 +396,12 @@ This is a recursive algorithm.
 (define ax+by=1
   (lambda (a b)
     (let ((q (quotient a b))
-	  (r (remainder a b)))
+          (r (remainder a b)))
       (if (= r 1)
-	  (list r (- q))
-	  (let ((sol (ax+by=1 b r)))
-	    (list (cadr sol)
-		  (- (car sol) (* q (cadr sol)))))))))
+        (list r (- q))
+        (let ((sol (ax+by=1 b r)))
+          (list (cadr sol)
+                (- (car sol) (* q (cadr sol)))))))))
 
 ; Tests
 
@@ -418,10 +418,10 @@ This is a recursive algorithm.
 (define (inversemod n)
   (lambda (e)
     (if (not (= (gcd e n) 1))
-	(error "inversemod requires (= (gcd e n) 1)")
-	; find d such that ed = 1 (mod n)
-	; means ed + nk = 1 for some int. k
-	(modulo (car (ax+by=1 e n)) n))))
+      (error "inversemod requires (= (gcd e n) 1)")
+      ; find d such that ed = 1 (mod n)
+      ; means ed + nk = 1 for some int. k
+      (modulo (car (ax+by=1 e n)) n))))
 
 
 ((inversemod 11) 5)
@@ -463,21 +463,21 @@ This is a recursive algorithm.
 
 (define (eg-send-message message receiver)
   (let ((public-key (eg-receiver-public-key receiver))
-	(decryption-procedure (eg-receiver-decryption-procedure receiver)))
+        (decryption-procedure (eg-receiver-decryption-procedure receiver)))
     (let ((dh-system (eg-public-key-system public-key))
-	  (receiver-advertised-number (eg-public-key-number public-key)))
+          (receiver-advertised-number (eg-public-key-number public-key)))
       (let ((p (dh-system-prime dh-system))
-	    (a (dh-system-primitive-root dh-system))
-	    (k (dh-system-size dh-system)))
-	(let ((my-secret (random-k-digit-number k))
-	      (mod-expt (exptmod p))
-	      (mod-* (modular p *)))
-	  (decryption-procedure
-	   (eg-make-ciphertext (mod-expt a my-secret) 
-			       (mod-* (string->integer message)
-				      (mod-expt
-				       receiver-advertised-number
-				       my-secret)))))))))
+            (a (dh-system-primitive-root dh-system))
+            (k (dh-system-size dh-system)))
+        (let ((my-secret (random-k-digit-number k))
+              (mod-expt (exptmod p))
+              (mod-* (modular p *)))
+          (decryption-procedure
+            (eg-make-ciphertext (mod-expt a my-secret) 
+                                (mod-* (string->integer message)
+                                       (mod-expt
+                                         receiver-advertised-number
+                                         my-secret)))))))))
 
 (define dh-system (public-dh-system 100))
 (define Alyssa (eg-receiver dh-system))
@@ -502,22 +502,22 @@ This is a recursive algorithm.
 
 (define (Eve-il receiver)
   (let ((receiver-public-key
-	 (eg-receiver-public-key receiver))
-	(receiver-decryption-procedure
-	 (eg-receiver-decryption-procedure receiver)))
+          (eg-receiver-public-key receiver))
+        (receiver-decryption-procedure
+          (eg-receiver-decryption-procedure receiver)))
     (let ((dh-system (eg-public-key-system receiver-public-key)))
       (let ((my-receiver (eg-receiver dh-system)))
-	(let ((my-public-key (eg-receiver-public-key my-receiver))
-	      (my-decryption-procedure
-	       (eg-receiver-decryption-procedure my-receiver)))
-	  (let ((my-spying-procedure
-		 (lambda (ciphertext)
-		   (let ((message (my-decryption-procedure ciphertext)))
-		     (write message)
-		     (newline)
-		     (eg-send-message (string-append message ", good friend ;)") receiver))))) 
-	    (eg-make-receiver my-public-key
-			      my-spying-procedure)))))))
+        (let ((my-public-key (eg-receiver-public-key my-receiver))
+              (my-decryption-procedure
+                (eg-receiver-decryption-procedure my-receiver)))
+          (let ((my-spying-procedure
+                  (lambda (ciphertext)
+                    (let ((message (my-decryption-procedure ciphertext)))
+                      (write message)
+                      (newline)
+                      (eg-send-message (string-append message ", good friend ;)") receiver))))) 
+            (eg-make-receiver my-public-key
+                              my-spying-procedure)))))))
 
 (define Eve-il-Alyssa (Eve-il Alyssa))
 

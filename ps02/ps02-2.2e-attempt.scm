@@ -6,23 +6,23 @@
 
 (define boolean-arithmetic
   (make-arithmetic 'boolean boolean? '()
-		   (lambda (name)
-		     (case name
-		       ((additive-identity) #f)
-		       ((multiplicative-identity) #t)
-		       (else (default-object))))
-  (lambda (operator)
-    (let ((procedure
-	   (case operator
-	     ((+) (lambda (x y) (or x y)))
-	     ((-) (lambda (x) (not x)))
-	     ((*) (lambda (x y) (and x y)))
-	     ((negate) (lambda (x) (not x)))
-	     (else
-	      (lambda args
-		(error "Operator undefined in Boolean" operator))))))
-      (and procedure
-	   (simple-operation operator boolean? procedure))))))
+                   (lambda (name)
+                     (case name
+                       ((additive-identity) #f)
+                       ((multiplicative-identity) #t)
+                       (else (default-object))))
+                   (lambda (operator)
+                     (let ((procedure
+                             (case operator
+                               ((+) (lambda (x y) (or x y)))
+                               ((-) (lambda (x) (not x)))
+                               ((*) (lambda (x y) (and x y)))
+                               ((negate) (lambda (x) (not x)))
+                               (else
+                                 (lambda args
+                                   (error "Operator undefined in Boolean" operator))))))
+                       (and procedure
+                            (simple-operation operator boolean? procedure))))))
 
 (install-arithmetic! boolean-arithmetic)
 
@@ -58,11 +58,11 @@
 
 (define (ensure-vector-lengths-match vecs)
   ( let (( first-vec-length ( vector-length ( car vecs ))))
-    ( if ( any ( lambda ( v)
-		 ( not (n:= ( vector-length v)
-			  first-vec-length )))
-	       vecs)
-	 (error "Vector dimension mismatch:" vecs))))
+        ( if ( any ( lambda ( v)
+                            ( not (n:= ( vector-length v)
+                                       first-vec-length )))
+                   vecs)
+             (error "Vector dimension mismatch:" vecs))))
 
 (define (vector-element-wise element-procedure)
   (lambda vecs
@@ -77,7 +77,7 @@
 (define (v:+ vector1 vector2)
   (ensure-vector-lengths-match (list vector1 vector2))
   (list->vector
-   (map sum (zip (vector->list vector1) (vector->list vector2)))))
+    (map sum (zip (vector->list vector1) (vector->list vector2)))))
 
 (v:+ #(1 2 3) #(4 5 6))
 ;Value 181: #(5 7 9)
@@ -93,7 +93,7 @@
   (ensure-vector-lengths-match (list vector1 vector2))
   (let ((product (lambda (l) (reduce * 1 l))))
     (sum
-     (map product (zip (vector->list vector1) (vector->list vector2))))))
+      (map product (zip (vector->list vector1) (vector->list vector2))))))
 
 (define (v:*-maker base-domain?)
   (lambda (arg1 arg2)
@@ -118,37 +118,37 @@
 
 (define (vector-extender base-arithmetic)
   (make-arithmetic
-   'vector
-   (disjoin vector? (arithmetic-domain-predicate base-arithmetic))
-   (list base-arithmetic)
+    'vector
+    (disjoin vector? (arithmetic-domain-predicate base-arithmetic))
+    (list base-arithmetic)
     (lambda (name base-constant)
       base-constant)
     (let ((base-predicate
-	   (arithmetic-domain-predicate base-arithmetic)))
+            (arithmetic-domain-predicate base-arithmetic)))
       (lambda (operator base-operation)
-	(case operator
-	  ((+)
-	   (simple-operation
-	    operator
-	    vector?
-	    (lambda (x y) (v:+ x y ))))
-	  ((-)
-	   (simple-operation
-	    operator
-	    vector?
-	    (lambda (x y) (v:- x y))))
-	  ((*)
-	   (make-operation
-	    operator
-	    (any-arg (operator-arity operator)
-		     vector?
-		     base-predicate)
-	    (v:*-maker base-predicate)))
-	  ((negate) (lambda (x) (v:negate x)))
-	  ((magnitude) (lambda (x) (v:magnitude x)))
-	  (else
-	   (lambda args
-	     (error "Operator undefined in Vector" operator))))))))
+        (case operator
+          ((+)
+           (simple-operation
+             operator
+             vector?
+             (lambda (x y) (v:+ x y ))))
+          ((-)
+           (simple-operation
+             operator
+             vector?
+             (lambda (x y) (v:- x y))))
+          ((*)
+           (make-operation
+             operator
+             (any-arg (operator-arity operator)
+                      vector?
+                      base-predicate)
+             (v:*-maker base-predicate)))
+          ((negate) (lambda (x) (v:negate x)))
+          ((magnitude) (lambda (x) (v:magnitude x)))
+          (else
+            (lambda args
+              (error "Operator undefined in Vector" operator))))))))
 
 (define vector-arithmetic
   (extend-arithmetic vector-extender numeric-arithmetic))

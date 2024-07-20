@@ -2,21 +2,21 @@
 
 (define (value-fit value predicate)
   (if (predicate value)
-      (lambda () value)
-      (value-restriction value predicate)))
+    (lambda () value)
+    (value-restriction value predicate)))
 
 (define value-restriction
   (simple-generic-procedure 'value-restriction 2))
 
 (define-generic-procedure-default-handler value-restriction
-  (lambda (value predicate)
-    #f))
+                                          (lambda (value predicate)
+                                            #f))
 
 (define (combine-fits procedure fits)
   (lambda ()
     (procedure
-     (map (lambda (fit) (fit))
-          fits))))
+      (map (lambda (fit) (fit))
+           fits))))
 
 (define (restriction-error value predicate)
   (error "Value doesn't fit predicate:" value predicate))
@@ -33,8 +33,8 @@
 (register-predicate! applicable-object? 'applicable-object)
 
 (define-record-type <applicable-object-metadata>
-    (make-applicable-object-metadata tag object applicator)
-    applicable-object-metadata?
+  (make-applicable-object-metadata tag object applicator)
+  applicable-object-metadata?
   (tag applicable-object-metadata-tag)
   (object applicable-object-metadata-object)
   (applicator applicable-object-metadata-applicator))
@@ -46,40 +46,40 @@
   ;; applicable objects that share the same procedure but with
   ;; different metadata.
   (let ((applicable-object
-         (lambda args (apply applicator args))))
+          (lambda args (apply applicator args))))
     (set-applicable-object-metadata!
-     applicable-object
-     (make-applicable-object-metadata (predicate->tag predicate)
-                                      object
-                                      applicator))
+      applicable-object
+      (make-applicable-object-metadata (predicate->tag predicate)
+                                       object
+                                       applicator))
     applicable-object))
 
 (define (applicable-object-tag object)
   (applicable-object-metadata-tag
-   (applicable-object-metadata object)))
+    (applicable-object-metadata object)))
 
 (define (applicable-object-predicate object)
   (tag->predicate (applicable-object-tag object)))
 
 (define (applicable-object->object object)
   (applicable-object-metadata-object
-   (applicable-object-metadata object)))
+    (applicable-object-metadata object)))
 
 (define-generic-procedure-handler get-tag
-  (match-args applicable-object?)
-  (lambda (object)
-    (applicable-object-metadata-tag
-     (applicable-object-metadata object))))
+                                  (match-args applicable-object?)
+                                  (lambda (object)
+                                    (applicable-object-metadata-tag
+                                      (applicable-object-metadata object))))
 
 (define-generic-procedure-handler get-data
-  (match-args applicable-object?)
-  (lambda (object)
-    (get-data (applicable-object->object object))))
+                                  (match-args applicable-object?)
+                                  (lambda (object)
+                                    (get-data (applicable-object->object object))))
 
 (define (strip-applicable-wrapper object)
   (if (applicable-object? object)
-      (applicable-object->object object)
-      object))
+    (applicable-object->object object)
+    object))
 
 ;;;; Unions of objects
 
@@ -90,62 +90,62 @@
   (guarantee n:list? components)
   (if (and (n:pair? components)
            (n:null? (cdr components)))
-      (car components)
-      (let ((components
-             (delete-duplicates
+    (car components)
+    (let ((components
+            (delete-duplicates
               (append-map (lambda (object)
                             (if (object-union? object)
-                                (object-union-components object)
-                                (list object)))
+                              (object-union-components object)
+                              (list object)))
                           components)
               eqv?)))
-        (cond ((not (n:pair? components))
-               (make-object-union components))
-              ((n:null? (cdr components))
-               (car components))
-              ((every function? components)
-               (union-function* components))
-              (else
-               (make-object-union components))))))
+      (cond ((not (n:pair? components))
+             (make-object-union components))
+            ((n:null? (cdr components))
+             (car components))
+            ((every function? components)
+             (union-function* components))
+            (else
+              (make-object-union components))))))
 
 (define (make-object-union components)
   (%make-object-union (predicate->tag
-                       (disjoin*
-                        (map get-predicate components)))
+                        (disjoin*
+                          (map get-predicate components)))
                       components))
 
 (define-record-type <object-union>
-    (%make-object-union tag components)
-    object-union?
+  (%make-object-union tag components)
+  object-union?
   (tag object-union-tag)
   (components object-union-components))
 (register-predicate! object-union? 'object-union)
 
 (define-record-printer <object-union>
-  object-union-components)
+                       object-union-components)
 
 (define-generic-procedure-handler get-tag
-  (match-args object-union?)
-  object-union-tag)
+                                  (match-args object-union?)
+                                  object-union-tag)
 
 (define-generic-procedure-handler value-restriction
-  (match-args object-union? predicate?)
-  (lambda (value predicate)
-    (let ((components
-           (filter predicate
-                   (object-union-components value))))
-      (and (n:pair? components)
-           (lambda () (object-union* components))))))
+                                  (match-args object-union? predicate?)
+                                  (lambda (value predicate)
+                                    (let ((components
+                                            (filter predicate
+                                                    (object-union-components value))))
+                                      (and (n:pair? components)
+                                           (lambda () (object-union* components))))))
 
 (define (map-object-union procedure union)
   (object-union*
-   (map procedure
-        (object-union-components union))))
+    (map procedure
+         (object-union-components union))))
 
 (define (append-map-object-union procedure union)
   (object-union*
-   (append-map procedure
-               (object-union-components union))))
+    (append-map procedure
+                (object-union-components union))))
 
 (define (object-union= u1 u2)
   (lset= equal*?
@@ -153,8 +153,8 @@
          (object-union-components u2)))
 
 (define-generic-procedure-handler equal*?
-  (match-args object-union? object-union?)
-  object-union=)
+                                  (match-args object-union? object-union?)
+                                  object-union=)
 
 ;;;; Various debugging tools for tagged data
 
@@ -168,19 +168,19 @@
          (tag-name (predicate->tag object)))
         ((simple-function? object)
          `(function
-           ,(simple-function-name object)
-           ,(tag-name (simple-function-tag object))
-           ,(strip-tags (simple-function-procedure object))))
+            ,(simple-function-name object)
+            ,(tag-name (simple-function-tag object))
+            ,(strip-tags (simple-function-procedure object))))
         ((tagged-data? object)
          `(tagged-data ,(tag-name (tagged-data-tag object))
                        ,(strip-tags (tagged-data-data object))))
         ((applicable-object? object)
          `(applicable
-           ,(rewrite-tags (applicable-object->object object))))
+            ,(rewrite-tags (applicable-object->object object))))
         ((object-union? object)
          `(union
-           ,@(map rewrite-tags
-                  (object-union-components object))))
+            ,@(map rewrite-tags
+                   (object-union-components object))))
         ((n:pair? object)
          (cons (rewrite-tags (car object))
                (rewrite-tags (cdr object))))
@@ -208,7 +208,7 @@
         ((n:vector? object)
          (vector-map tags-of object))
         (else
-         (tag-name (get-tag object)))))
+          (tag-name (get-tag object)))))
 
 (define (strip-tags object)
   (cond ((simple-function? object)

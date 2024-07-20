@@ -22,22 +22,22 @@ More information on MIT scheme records at:
 http://groups.csail.mit.edu/mac/projects/scheme/documentation/scheme_11.html#SEC110
 
 (define-record-type <record-name>
-    (<record-constructor> <fieldname0> ...)
-    <predicate>
+  (<record-constructor> <fieldname0> ...)
+  <predicate>
   (<fieldname0> <fieldname0-accessor>)
   ...)
 |#
 
 (define-record-type compound-procedure
-    (make-compound-procedure vars bproc env)
-    compound-procedure?
+  (make-compound-procedure vars bproc env)
+  compound-procedure?
   (vars  procedure-parameters)
   (bproc procedure-body)
   (env   procedure-environment))
 
 (define-record-type actor-procedure
-    (make-actor-procedure% vars bproc env task-queue runnable)
-    actor-procedure?
+  (make-actor-procedure% vars bproc env task-queue runnable)
+  actor-procedure?
   (vars  actor-parameters)
   (bproc actor-body)
   (env   actor-environment)
@@ -51,10 +51,10 @@ http://groups.csail.mit.edu/mac/projects/scheme/documentation/scheme_11.html#SEC
 
 (define (extend-environment variables values base-environment)
   (if (fix:= (length variables) (length values))
-      (vector variables values base-environment)
-      (if (fix:< (length variables) (length values))
-	  (error "Too many arguments supplied" variables values)
-	  (error "Too few arguments supplied" variables values))))
+    (vector variables values base-environment)
+    (if (fix:< (length variables) (length values))
+      (error "Too many arguments supplied" variables values)
+      (error "Too few arguments supplied" variables values))))
 
 (define (environment-variables env) (vector-ref env 0))
 (define (environment-values env) (vector-ref env 1))
@@ -65,13 +65,13 @@ http://groups.csail.mit.edu/mac/projects/scheme/documentation/scheme_11.html#SEC
 (define (lookup-variable-value var env)
   (let plp ((env env))
     (if (eq? env the-empty-environment)
-	(lookup-scheme-value var)
-	(let scan
-	    ((vars (vector-ref env 0))
-	     (vals (vector-ref env 1)))
-	  (cond ((null? vars) (plp (vector-ref env 2)))
-		((eq? var (car vars)) (car vals))
-		(else (scan (cdr vars) (cdr vals))))))))
+      (lookup-scheme-value var)
+      (let scan
+        ((vars (vector-ref env 0))
+         (vals (vector-ref env 1)))
+        (cond ((null? vars) (plp (vector-ref env 2)))
+              ((eq? var (car vars)) (car vals))
+              (else (scan (cdr vars) (cdr vals))))))))
 
 ;;; Extension to make underlying Scheme values available to interpreter
 
@@ -80,42 +80,42 @@ http://groups.csail.mit.edu/mac/projects/scheme/documentation/scheme_11.html#SEC
 
 (define (define-variable! var val env)
   (if (eq? env the-empty-environment)
-      (error "Unbound variable -- DEFINE" var) ;should not happen.
-      (let scan
-	  ((vars (vector-ref env 0))
-	   (vals (vector-ref env 1)))
-	(cond ((null? vars)
-	       (double-check-lock
-		(lambda () (null? vars))
-		(lambda () 
-		  (vector-set! env 0 (cons var (vector-ref env 0)))
-		  (vector-set! env 1 (cons val (vector-ref env 1))))
-		(lambda ()
-		  (define-variable! var val env))))
-	      ((eq? var (car vars))
-               (double-check-lock
-                (lambda () (eq? var (car vars)))
-                (lambda ()
-		  (set-car! vals val))
-                (lambda ()
-		  (define-variable! var val env))))
-	      (else
-	       (scan (cdr vars) (cdr vals)))))))
+    (error "Unbound variable -- DEFINE" var) ;should not happen.
+    (let scan
+      ((vars (vector-ref env 0))
+       (vals (vector-ref env 1)))
+      (cond ((null? vars)
+             (double-check-lock
+               (lambda () (null? vars))
+               (lambda () 
+                 (vector-set! env 0 (cons var (vector-ref env 0)))
+                 (vector-set! env 1 (cons val (vector-ref env 1))))
+               (lambda ()
+                 (define-variable! var val env))))
+            ((eq? var (car vars))
+             (double-check-lock
+               (lambda () (eq? var (car vars)))
+               (lambda ()
+                 (set-car! vals val))
+               (lambda ()
+                 (define-variable! var val env))))
+            (else
+              (scan (cdr vars) (cdr vals)))))))
 
 (define (set-variable-value! var val env)
   (let plp ((env env))
     (if (eq? env the-empty-environment)
-	(error "Unbound variable -- SET!" var)
-	(let scan
-	    ((vars (vector-ref env 0))
-	     (vals (vector-ref env 1)))
-	  (cond ((null? vars) (plp (vector-ref env 2)))
-		((eq? var (car vars))
-                 (double-check-lock
-                  (lambda () (eq? var (car vars)))
-                  (lambda ()
-		    (set-car! vals val))
-                  (lambda () (plp env))))
-		(else (scan (cdr vars) (cdr vals))))))))
+      (error "Unbound variable -- SET!" var)
+      (let scan
+        ((vars (vector-ref env 0))
+         (vals (vector-ref env 1)))
+        (cond ((null? vars) (plp (vector-ref env 2)))
+              ((eq? var (car vars))
+               (double-check-lock
+                 (lambda () (eq? var (car vars)))
+                 (lambda ()
+                   (set-car! vals val))
+                 (lambda () (plp env))))
+              (else (scan (cdr vars) (cdr vals))))))))
 
 

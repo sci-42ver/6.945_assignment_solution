@@ -1,6 +1,6 @@
 (define-record-type <trie>
-    (%make-trie value edge-alist)
-    trie?
+  (%make-trie value edge-alist)
+  trie?
   (value %trie-value set-trie-value!)
   (edge-alist trie-edge-alist set-trie-edge-alist!))
 
@@ -19,20 +19,20 @@
 (define (intern-path-trie trie path)
   (let loop ((trie trie) (path path))
     (if (n:pair? path)
-        (loop (add-edge-to-trie trie (car path))
-              (cdr path))
-        trie)))
+      (loop (add-edge-to-trie trie (car path))
+            (cdr path))
+      trie)))
 
 ;; Gets the edge of TRIE for PREDICATE, creating it if needed.
 (define (add-edge-to-trie trie predicate)
   (let ((p (assv predicate (trie-edge-alist trie))))
     (if p
-        (cdr p)
-        (let ((successor (make-trie)))
-          (set-trie-edge-alist! trie
-                                (cons (cons predicate successor)
-                                      (trie-edge-alist trie)))
-          successor))))
+      (cdr p)
+      (let ((successor (make-trie)))
+        (set-trie-edge-alist! trie
+                              (cons (cons predicate successor)
+                                    (trie-edge-alist trie)))
+        successor))))
 
 ;; Sets the value of the node identified by PATH to VALUE.
 (define (set-path-value! trie path value)
@@ -44,12 +44,12 @@
 (define (get-matching-tries trie features)
   (let loop ((tries (list trie)) (features features))
     (if (n:pair? features)
-        (loop (append-map (lambda (trie)
-                            (%find-all-edges trie
-                                             (car features)))
-                          tries)
-              (cdr features))
-        tries)))
+      (loop (append-map (lambda (trie)
+                          (%find-all-edges trie
+                                           (car features)))
+                        tries)
+            (cdr features))
+      tries)))
 
 (define (apply-predicate predicate feature)
   (increment-predicate-count! predicate)
@@ -63,29 +63,29 @@
 
 (define (get-a-value-by-filtering trie features)
   (let ((nodes
-         (filter trie-has-value?
-                 (get-matching-tries trie features))))
+          (filter trie-has-value?
+                  (get-matching-tries trie features))))
     (if (n:pair? nodes)
-        (trie-value (car nodes))
-        (error "Unable to match features:" features))))
+      (trie-value (car nodes))
+      (error "Unable to match features:" features))))
 
 (define (get-a-value-by-searching trie features)
   (let loop
-      ((trie trie)
-       (features features)
-       (succeed (lambda (value fail) value))
-       (fail
-        (lambda ()
-          (error "Unable to match features:" features))))
+    ((trie trie)
+     (features features)
+     (succeed (lambda (value fail) value))
+     (fail
+       (lambda ()
+         (error "Unable to match features:" features))))
     (if (n:pair? features)
-        (%try-edges (trie-edge-alist trie)
-                    (car features)
-                    (lambda (trie* fail*)
-                      (loop trie* (cdr features) succeed fail*))
-                    fail)
-        (if (trie-has-value? trie)
-            (succeed (trie-value trie) fail)
-            (fail)))))
+      (%try-edges (trie-edge-alist trie)
+                  (car features)
+                  (lambda (trie* fail*)
+                    (loop trie* (cdr features) succeed fail*))
+                  fail)
+      (if (trie-has-value? trie)
+        (succeed (trie-value trie) fail)
+        (fail)))))
 
 (define (%find-all-edges trie feature)
   (map cdr
@@ -95,20 +95,20 @@
 
 (define (%try-edges edges feature succeed fail)
   (if (n:pair? edges)
-      (%try-edge (car edges)
-                 feature
-                 succeed
-                 (lambda ()
-                   (%try-edges (cdr edges)
-                               feature
-                               succeed
-                               fail)))
-      (fail)))
+    (%try-edge (car edges)
+               feature
+               succeed
+               (lambda ()
+                 (%try-edges (cdr edges)
+                             feature
+                             succeed
+                             fail)))
+    (fail)))
 
 (define (%try-edge edge feature succeed fail)
   (if (apply-predicate (car edge) feature)
-      (succeed (cdr edge) fail)
-      (fail)))
+    (succeed (cdr edge) fail)
+    (fail)))
 
 #|
 ;;; For example...

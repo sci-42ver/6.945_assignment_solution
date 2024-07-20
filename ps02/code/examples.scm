@@ -4,7 +4,7 @@
 
 (define pure-numeric-function-arithmetic
   (extend-arithmetic pure-function-extender
-		     numeric-arithmetic))
+                     numeric-arithmetic))
 
 (install-arithmetic! pure-numeric-function-arithmetic)
 
@@ -18,8 +18,8 @@
 ;Error
 
 (define mixed-numeric-function-arithmetic
- (extend-arithmetic function-extender
-		    numeric-arithmetic))
+  (extend-arithmetic function-extender
+                     numeric-arithmetic))
 
 (install-arithmetic! mixed-numeric-function-arithmetic)
 
@@ -37,7 +37,7 @@
 
 (define full-arithmetic
   (extend-arithmetic function-extender-with-coercion
-		     combined-arithmetic))
+                     combined-arithmetic))
 
 
 (install-arithmetic! full-arithmetic)

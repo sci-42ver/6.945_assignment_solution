@@ -10,13 +10,13 @@
 
 (define (make-generic-procedure name arity dispatcher)
   (let* ((metadata
-          (make-generic-metadata name
-                                 arity
-                                 (dispatcher)
-                                 (get-default-handler name)))
+           (make-generic-metadata name
+                                  arity
+                                  (dispatcher)
+                                  (get-default-handler name)))
          (procedure
-          (lambda args
-            (generic-procedure-dispatch metadata args))))
+           (lambda args
+             (generic-procedure-dispatch metadata args))))
     (set-generic-procedure-metadata! procedure metadata)
     procedure))
 
@@ -30,22 +30,22 @@
 (define (generic-procedure-dispatch metadata args)
   (let ((handler (get-generic-procedure-handler metadata args)))
     (if trace-generic-dispatch?
-        (trace-generic-dispatch metadata args handler))
+      (trace-generic-dispatch metadata args handler))
     (apply handler args)))
 
 (define (trace-generic-dispatch metadata args handler)
   (fluid-let ((trace-generic-dispatch? #f))
-    (let ((port (trace-output-port)))
-      (fresh-line port)
-      (display ";Calling method of " port)
-      (display (generic-metadata-name metadata) port)
-      (display ": " port)
-      (write handler port)
-      (for-each (lambda (arg)
-                  (display " " port)
-                  (write arg port))
-                args)
-      (newline port))))
+             (let ((port (trace-output-port)))
+               (fresh-line port)
+               (display ";Calling method of " port)
+               (display (generic-metadata-name metadata) port)
+               (display ": " port)
+               (write handler port)
+               (for-each (lambda (arg)
+                           (display " " port)
+                           (write arg port))
+                         args)
+               (newline port))))
 
 (define trace-generic-dispatch? #f)
 
@@ -56,14 +56,14 @@
 (define (define-generic-procedure-handler proc applicability
                                           handler)
   (((generic-metadata-dispatcher
-     (generic-procedure-metadata proc))
+      (generic-procedure-metadata proc))
     'add-handler!)
    applicability
    handler))
 
 (define (define-generic-procedure-default-handler proc handler)
   (((generic-metadata-dispatcher
-     (generic-procedure-metadata proc))
+      (generic-procedure-metadata proc))
     'set-default-handler!)
    handler))
 
@@ -75,7 +75,7 @@
 
 (define (generic-procedure-rules proc)
   (((generic-metadata-dispatcher
-     (generic-procedure-metadata proc))
+      (generic-procedure-metadata proc))
     'get-rules)))
 
 (define (generic-procedure-handlers proc)
@@ -84,9 +84,9 @@
 ;;;; Metadata
 
 (define-record-type <generic-metadata>
-    (%make-generic-metadata name arity dispatcher getter
-                            default-getter)
-    generic-metadata?
+  (%make-generic-metadata name arity dispatcher getter
+                          default-getter)
+  generic-metadata?
   (name generic-metadata-name)
   (arity generic-metadata-arity)
   (dispatcher generic-metadata-dispatcher)
@@ -110,9 +110,9 @@
 
     (define (get-handler args)
       (let ((rule
-             (find (lambda (rule)
-                     (predicates-match? (car rule) args))
-                   rules)))
+              (find (lambda (rule)
+                      (predicates-match? (car rule) args))
+                    rules)))
         (and rule
              (cdr rule))))
 
@@ -120,10 +120,10 @@
       (for-each (lambda (predicates)
                   (let ((p (assoc predicates rules)))
                     (if p
-                        (set-cdr! p handler)
-                        (set! rules
-                              (cons (cons predicates handler)
-                                    rules)))))
+                      (set-cdr! p handler)
+                      (set! rules
+                        (cons (cons predicates handler)
+                              rules)))))
                 applicability))
 
     (define (get-default-handler)
@@ -162,10 +162,10 @@
 
 (define (make-cached-generic-dispatcher base-dispatcher get-key)
   (let ((get-handler
-         (simple-list-memoizer eqv?
-                               hash-by-eqv
-                               (lambda (args) (map get-key args))
-                               (base-dispatcher 'get-handler))))
+          (simple-list-memoizer eqv?
+                                hash-by-eqv
+                                (lambda (args) (map get-key args))
+                                (base-dispatcher 'get-handler))))
     (lambda (message)
       (case message
         ((get-handler) get-handler)

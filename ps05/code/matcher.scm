@@ -20,26 +20,26 @@
 (define (match:eqv pattern-constant)
   (define (eqv-match data dictionary succeed)
     (and (pair? data)
-	 (eqv? (car data) pattern-constant)
-	 (succeed dictionary 1)))
+         (eqv? (car data) pattern-constant)
+         (succeed dictionary 1)))
   eqv-match)
 
 (define (match:element variable restrictions)
   (define (ok? datum)
     (every (lambda (restriction)
-	     (restriction datum))
-	   restrictions))
+             (restriction datum))
+           restrictions))
   (define (element-match data dictionary succeed)
     (and (pair? data)
-	 (ok? (car data))
-	 (let ((vcell (match:lookup variable dictionary)))
-	   (if vcell
-	       (and (equal? (match:value vcell) (car data))
-		    (succeed dictionary 1))
-	       (succeed (match:bind variable
-				    (car data)
-				    dictionary)
-			1)))))
+         (ok? (car data))
+         (let ((vcell (match:lookup variable dictionary)))
+           (if vcell
+             (and (equal? (match:value vcell) (car data))
+                  (succeed dictionary 1))
+             (succeed (match:bind variable
+                                  (car data)
+                                  dictionary)
+                      1)))))
   element-match)
 
 
@@ -57,50 +57,50 @@
 (define (match:segment variable)
   (define (segment-match data dictionary succeed)
     (and (list? data)
-	 (let ((vcell (match:lookup variable dictionary)))
-	   (if vcell
-	       (let lp ((data data)
-			(pattern (match:value vcell))
-			(n 0))
-		 (cond ((pair? pattern)
-			(if (and (pair? data)
-				 (equal? (car data) (car pattern)))
-			    (lp (cdr data) (cdr pattern) (+ n 1))
-			    #f))
-		       ((not (null? pattern)) #f)
-		       (else (succeed dictionary n))))
-	       (let ((n (length data)))
-		 (let lp ((i 0))
-		   (if (<= i n)
-		       (or (succeed (match:bind variable
-						(list-head data i)
-						dictionary)
-				    i)
-			   (lp (+ i 1)))
-		       #f)))))))
+         (let ((vcell (match:lookup variable dictionary)))
+           (if vcell
+             (let lp ((data data)
+                      (pattern (match:value vcell))
+                      (n 0))
+               (cond ((pair? pattern)
+                      (if (and (pair? data)
+                               (equal? (car data) (car pattern)))
+                        (lp (cdr data) (cdr pattern) (+ n 1))
+                        #f))
+                     ((not (null? pattern)) #f)
+                     (else (succeed dictionary n))))
+             (let ((n (length data)))
+               (let lp ((i 0))
+                 (if (<= i n)
+                   (or (succeed (match:bind variable
+                                            (list-head data i)
+                                            dictionary)
+                                i)
+                       (lp (+ i 1)))
+                   #f)))))))
   segment-match)
 
 (define (match:list . match-combinators)
   (define (list-match data dictionary succeed)
     (and (pair? data)
-	 (let lp ((lst (car data))
-		  (matchers match-combinators)
-		  (dictionary dictionary))
-	   (cond ((pair? matchers)
-		  ((car matchers)
-		   lst
-		   dictionary
-		   (lambda (new-dictionary n)
-		     (if (> n (length lst))
-			 (error "Matcher ate too much."
-				n))
-		     (lp (list-tail lst n)
-			 (cdr matchers)
-			 new-dictionary))))
-		 ((pair? lst) #f)
-		 ((null? lst)
-		  (succeed dictionary 1))
-		 (else #f)))))
+         (let lp ((lst (car data))
+                  (matchers match-combinators)
+                  (dictionary dictionary))
+           (cond ((pair? matchers)
+                  ((car matchers)
+                   lst
+                   dictionary
+                   (lambda (new-dictionary n)
+                     (if (> n (length lst))
+                       (error "Matcher ate too much."
+                              n))
+                     (lp (list-tail lst n)
+                         (cdr matchers)
+                         new-dictionary))))
+                 ((pair? lst) #f)
+                 ((null? lst)
+                  (succeed dictionary 1))
+                 (else #f)))))
   list-match)
 
 ;;; Syntax of matching is determined here.
@@ -119,35 +119,35 @@
 (define (match:list? pattern)
   (and (list? pattern)
        (or (null? pattern)
-	   (not (memq (car pattern) '(? ??))))))
+           (not (memq (car pattern) '(? ??))))))
 
 (define match:->combinators
   (make-generic-operator 1 'eqv match:eqv))
 
 (defhandler match:->combinators
-  (lambda (pattern)
-    (match:element
-     (match:variable-name pattern)
-     (match:restrictions pattern)))
-  match:element?)
+            (lambda (pattern)
+              (match:element
+                (match:variable-name pattern)
+                (match:restrictions pattern)))
+            match:element?)
 
 (defhandler match:->combinators
-  (lambda (pattern) (match:segment (match:variable-name pattern)))
-  match:segment?)
+            (lambda (pattern) (match:segment (match:variable-name pattern)))
+            match:segment?)
 
 (defhandler match:->combinators
-  (lambda (pattern)
-    (apply match:list (map match:->combinators pattern)))
-  match:list?)
+            (lambda (pattern)
+              (apply match:list (map match:->combinators pattern)))
+            match:list?)
 
 (define (matcher pattern)
   (let ((match-combinator (match:->combinators pattern)))
     (lambda (datum)
       (match-combinator (list datum)
-			'()
-			(lambda (dictionary n)
-			  (and (= n 1)
-			       dictionary))))))
+                        '()
+                        (lambda (dictionary n)
+                          (and (= n 1)
+                               dictionary))))))
 
 #|
 (define (report-success dict n)
@@ -157,19 +157,19 @@
 ((match:->combinators '(a ((? b) 2 3) 1 c))
  '((a (1 2 3) 1 c))
  '()
-  report-success)
+ report-success)
 ;Value: (succeed ((b 1)))
 
 ((match:->combinators '(a ((? b) 2 3) (? b) c))
  '((a (1 2 3) 2 c))
  '()
-  report-success)
+ report-success)
 ;Value: #f
 
 ((match:->combinators '(a ((? b) 2 3) (? b) c))
  '((a (1 2 3) 1 c))
  '()
-  report-success)
+ report-success)
 ;Value: (succeed ((b 1)))
 
 
@@ -199,20 +199,20 @@
     (cond ((or (match:element? pattern)
                (match:segment? pattern))
            (let ((name
-		  (match:variable-name pattern)))
+                   (match:variable-name pattern)))
              (if (memq name names)
-                 names
-                 (cons name names))))
+               names
+               (cons name names))))
           ((list? pattern)
            (let elt-loop
-	       ((elts pattern) (names names))
+             ((elts pattern) (names names))
              (if (pair? elts)
-                 (elt-loop (cdr elts)
-			   (loop (car elts) names))
-                 names)))
+               (elt-loop (cdr elts)
+                         (loop (car elts) names))
+               names)))
           (else names))))
 
 #|
- (match:pattern-names '((? a) (?? b)))
- ;Value: (b a)
+(match:pattern-names '((? a) (?? b)))
+;Value: (b a)
 |#

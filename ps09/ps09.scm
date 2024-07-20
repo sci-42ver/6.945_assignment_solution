@@ -6,17 +6,17 @@
 Problem 1
 
 (define (foo n)
- (define (buzz m)
- (if (not (= m 0)) (buzz (- m 1))))
- (define iter
- (alpha (l i)
- (if (not (= i 0))
- (begin
- (if (eq? l 'a) (buzz (* 100 i)) (buzz (* 100 (- n i))))
- (pp (list l i))
- (iter l (- i 1))))))
- (iter 'a n)
- (iter 'b n))
+  (define (buzz m)
+    (if (not (= m 0)) (buzz (- m 1))))
+  (define iter
+    (alpha (l i)
+           (if (not (= i 0))
+             (begin
+               (if (eq? l 'a) (buzz (* 100 i)) (buzz (* 100 (- n i))))
+               (pp (list l i))
+               (iter l (- i 1))))))
+  (iter 'a n)
+  (iter 'b n))
 
 The reason we get this output order is that the early calls to `iter' with 'a as the first argument and with i as 10, take a long time to complete; whereas the `iter' calls with 'b as the first argument and with i as 10 complete faster. So a few 'b calls can finish before the first 'a one does, and a few more 'b calls can finish before the next 'a one does, etc.  
 
@@ -38,30 +38,30 @@ But I suppose it can't hurt to try something like this....
 
 #|
 (defhandler apply
-  (lambda (actor operands calling-environment)
-    (if (not (= (length (actor-parameters actor))
-		(length operands)))
-	(error "Wrong number of operands supplied"))
-    (let ((arguments
-	   (map (lambda (parameter operand)
-		  (add-to-tasks! actor
-				 (lambda ()
-				   (evaluate-procedure-operand parameter
-							       operand
-							       calling-environment)))
-		  'actor-applied)
-		(actor-parameters actor)
-		operands)))
-      (add-to-tasks! actor
-		     (lambda ()
-		       (eval (actor-body actor)
-			     (extend-environment
-			      (map procedure-parameter-name
-				   (actor-parameters actor))
-			      arguments
-			      (actor-environment actor)))))
-      'actor-applied))
-  actor-procedure?)
+            (lambda (actor operands calling-environment)
+              (if (not (= (length (actor-parameters actor))
+                          (length operands)))
+                (error "Wrong number of operands supplied"))
+              (let ((arguments
+                      (map (lambda (parameter operand)
+                             (add-to-tasks! actor
+                                            (lambda ()
+                                              (evaluate-procedure-operand parameter
+                                                                          operand
+                                                                          calling-environment)))
+                             'actor-applied)
+                           (actor-parameters actor)
+                           operands)))
+                (add-to-tasks! actor
+                               (lambda ()
+                                 (eval (actor-body actor)
+                                       (extend-environment
+                                         (map procedure-parameter-name
+                                              (actor-parameters actor))
+                                         arguments
+                                         (actor-environment actor)))))
+                'actor-applied))
+            actor-procedure?)
 
 |#
 
@@ -95,26 +95,26 @@ Code and tests below:
 (init)
 
 eval> (define fib2
-       (alpha (n c)
-         (if (< n 2)
-             (c n)
-             (let ((x 'not-ready) (y 'not-ready))
-               (define check-if-done
-                 (lambda ()
-                   (if (boolean/or (eq? x 'not-ready)
-                                   (eq? y 'not-ready))
-#f
-                       (c (+ x y)))))
-               (fib2 (- n 1)
-                     (lambda (v)
-                      (atomically (lambda ()
-                       (set! x v)
-                       (check-if-done)))))
-               (fib2 (- n 2)
-                     (lambda (v)
-                      (atomically (lambda ()
-                       (set! y v)
-                       (check-if-done)))))))))
+        (alpha (n c)
+               (if (< n 2)
+                 (c n)
+                 (let ((x 'not-ready) (y 'not-ready))
+                   (define check-if-done
+                     (lambda ()
+                       (if (boolean/or (eq? x 'not-ready)
+                                       (eq? y 'not-ready))
+                         #f
+                         (c (+ x y)))))
+                   (fib2 (- n 1)
+                         (lambda (v)
+                           (atomically (lambda ()
+                                         (set! x v)
+                                         (check-if-done)))))
+                   (fib2 (- n 2)
+                         (lambda (v)
+                           (atomically (lambda ()
+                                         (set! y v)
+                                         (check-if-done)))))))))
 fib2
 
 eval> (fib2 10 write-line)
@@ -313,9 +313,9 @@ actor-applied
 ;(a)
 
 (define-record-type
-    future
-    (make-future cont done? value)
-    future?
+  future
+  (make-future cont done? value)
+  future?
   (cont   continuation)
   (done?  done?     set-done!)
   (value  get-value set-value!))
@@ -330,11 +330,11 @@ actor-applied
 |#
 
 #|
-  (if (done? future)
-      ;(add-to-tasks!
-      ; actor
-       (lambda ()
-	 (cont (get-value future)))
-      ;)
-      #f))
+(if (done? future)
+  ;(add-to-tasks!
+  ; actor
+  (lambda ()
+    (cont (get-value future)))
+  ;)
+  #f))
 |#

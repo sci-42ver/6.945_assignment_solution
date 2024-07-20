@@ -15,19 +15,19 @@
   (property-getter thing:location thing?))
 
 (define-generic-procedure-handler set-up! (match-args thing?)
-  (lambda (super thing)
-    (super thing)
-    (add-thing! (get-location thing) thing)))
+                                  (lambda (super thing)
+                                    (super thing)
+                                    (add-thing! (get-location thing) thing)))
 
 (define-generic-procedure-handler tear-down! (match-args thing?)
-  (lambda (super thing)
-    (remove-thing! (get-location thing) thing)
-    (super thing)))
+                                  (lambda (super thing)
+                                    (remove-thing! (get-location thing) thing)
+                                    (super thing)))
 
 (define-generic-procedure-handler send-message!
-  (match-args message? thing?)
-  (lambda (message thing)
-    unspecific))
+                                  (match-args message? thing?)
+                                  (lambda (message thing)
+                                    unspecific))
 
 ;;; Containers
 
@@ -80,9 +80,9 @@
   (property-getter exit:direction exit?))
 
 (define-generic-procedure-handler set-up! (match-args exit?)
-  (lambda (super exit)
-    (super exit)
-    (add-exit! (get-from exit) exit)))
+                                  (lambda (super exit)
+                                    (super exit)
+                                    (add-exit! (get-from exit) exit)))
 
 ;;; Places
 
@@ -137,11 +137,11 @@
           (append-map get-things (people-in-place place))))
 
 (define-generic-procedure-handler send-message!
-  (match-args message? place?)
-  (lambda (message place)
-    (for-each (lambda (person)
-                (send-message! message person))
-              (people-in-place place))))
+                                  (match-args message? place?)
+                                  (lambda (message place)
+                                    (for-each (lambda (person)
+                                                (send-message! message person))
+                                              (people-in-place place))))
 
 ;;; Mobile things
 
@@ -167,13 +167,13 @@
   (chaining-generic-procedure 'enter-place! 1))
 
 (define-generic-procedure-default-handler enter-place!
-  (lambda (mobile-thing) #f))
+                                          (lambda (mobile-thing) #f))
 
 (define leave-place!
   (std-generic-procedure 'leave-place! 1))
 
 (define-generic-procedure-default-handler leave-place!
-  (lambda (mobile-thing) #f))
+                                          (lambda (mobile-thing) #f))
 
 ;;; People
 
@@ -202,28 +202,28 @@
   (property-getter person:bag person?))
 
 (define-generic-procedure-handler set-up! (match-args person?)
-  (lambda (super person)
-    (super person)
-    (set-holder! (get-bag person) person)))
+                                  (lambda (super person)
+                                    (super person)
+                                    (set-holder! (get-bag person) person)))
 
 (define-generic-procedure-handler get-things (match-args person?)
-  (lambda (person)
-    (get-things (get-bag person))))
+                                  (lambda (person)
+                                    (get-things (get-bag person))))
 
 (define-generic-procedure-handler enter-place!
-  (match-args person?)
-  (lambda (super person)
-    (super person)
-    (narrate! (list person "enters" (get-location person))
-              person)
-    (let ((people (people-here person)))
-      (if (n:pair? people)
-          (say! person (cons "Hi" people))))))
+                                  (match-args person?)
+                                  (lambda (super person)
+                                    (super person)
+                                    (narrate! (list person "enters" (get-location person))
+                                              person)
+                                    (let ((people (people-here person)))
+                                      (if (n:pair? people)
+                                        (say! person (cons "Hi" people))))))
 
 (define (when-alive callback)
   (lambda (person)
     (if (n:> (get-health person) 0)
-        (callback person))))
+      (callback person))))
 
 (define (people-here person)
   (delv person (people-in-place (get-location person))))
@@ -245,14 +245,14 @@
   (say! person (list "Ouch!" hits "hits is more than I want!"))
   (set-health! person (- (get-health person) hits))
   (if (< (get-health person) 1)
-      (die! person)))
+    (die! person)))
 
 (define (die! person)
   (for-each (lambda (thing)
               (drop-thing! thing person))
             (get-things person))
   (announce!
-   '("An earth-shattering, soul-piercing scream is heard..."))
+    '("An earth-shattering, soul-piercing scream is heard..."))
   (set-health! person 0)
   (move! person (get-heaven) person))
 
@@ -307,34 +307,34 @@
                    autonomous-agent?))
 
 (define-generic-procedure-handler set-up!
-  (match-args autonomous-agent?)
-  (lambda (super agent)
-    (super agent)
-    (register-with-clock! agent (get-clock))))
+                                  (match-args autonomous-agent?)
+                                  (lambda (super agent)
+                                    (super agent)
+                                    (register-with-clock! agent (get-clock))))
 
 (define-generic-procedure-handler tear-down!
-  (match-args autonomous-agent?)
-  (lambda (super agent)
-    (unregister-with-clock! agent (get-clock))
-    (super agent)))
+                                  (match-args autonomous-agent?)
+                                  (lambda (super agent)
+                                    (unregister-with-clock! agent (get-clock))
+                                    (super agent)))
 
 (define (move-and-take-stuff! agent)
   (if (flip-coin (get-restlessness agent))
-      (move-somewhere! agent))
+    (move-somewhere! agent))
   (if (flip-coin (get-acquisitiveness agent))
-      (take-something! agent)))
+    (take-something! agent)))
 
 (define (move-somewhere! agent)
   (let ((exit (random-choice (exits-here agent))))
     (if exit
-        (take-exit! exit agent))))
+      (take-exit! exit agent))))
 
 (define (take-something! agent)
   (let ((thing
-         (random-choice (append (things-here agent)
-                                (peoples-things agent)))))
+          (random-choice (append (things-here agent)
+                                 (peoples-things agent)))))
     (if thing
-        (take-thing! thing agent))))
+      (take-thing! thing agent))))
 
 (define-clock-handler autonomous-agent? move-and-take-stuff!)
 
@@ -366,24 +366,24 @@
 (define (irritate-students! master)
   (let ((students (filter student? (people-here master))))
     (if (flip-coin (get-irritability master))
-        (if (n:pair? students)
-            (begin
-              (say! master
-                    '("What are you doing still up?"
-                      "Everyone back to their rooms!"))
-              (for-each (lambda (student)
-                          (narrate! (list student "goes home to"
-                                          (get-origin student))
-                                    student)
-                          (move! student
-                                 (get-origin student)
-                                 student))
-                        students))
-            (say! master
-                  '("Grrr... When I catch those students...")))
-        (if (n:pair? students)
-            (say! master
-                  '("I'll let you off this once..."))))))
+      (if (n:pair? students)
+        (begin
+          (say! master
+                '("What are you doing still up?"
+                  "Everyone back to their rooms!"))
+          (for-each (lambda (student)
+                      (narrate! (list student "goes home to"
+                                      (get-origin student))
+                                student)
+                      (move! student
+                             (get-origin student)
+                             student))
+                    students))
+        (say! master
+              '("Grrr... When I catch those students...")))
+      (if (n:pair? students)
+        (say! master
+              '("I'll let you off this once..."))))))
 
 (define-clock-handler house-master? irritate-students!)
 
@@ -405,14 +405,14 @@
 
 (define (eat-people! troll)
   (if (flip-coin (get-hunger troll))
-      (let ((people (people-here troll)))
-        (if (n:pair? people)
-            (let ((victim (random-choice people)))
-              (narrate! (list troll "takes a bite out of" victim)
-                        troll)
-              (suffer! (random-number 3) victim))
-            (narrate! (list (possessive troll) "belly rumbles")
-                      troll)))))
+    (let ((people (people-here troll)))
+      (if (n:pair? people)
+        (let ((victim (random-choice people)))
+          (narrate! (list troll "takes a bite out of" victim)
+                    troll)
+          (suffer! (random-number 3) victim))
+        (narrate! (list (possessive troll) "belly rumbles")
+                  troll)))))
 
 (define-clock-handler troll? eat-people!)
 
@@ -433,40 +433,40 @@
   (property-getter avatar:screen avatar?))
 
 (define-generic-procedure-handler send-message!
-  (match-args message? avatar?)
-  (lambda (message avatar)
-    (send-message! message (get-screen avatar))))
+                                  (match-args message? avatar?)
+                                  (lambda (message avatar)
+                                    (send-message! message (get-screen avatar))))
 
 (define-generic-procedure-handler enter-place!
-  (match-args avatar?)
-  (lambda (super avatar)
-    (super avatar)
-    (look-around avatar)
-    (tick! (get-clock))))
+                                  (match-args avatar?)
+                                  (lambda (super avatar)
+                                    (super avatar)
+                                    (look-around avatar)
+                                    (tick! (get-clock))))
 
 (define (look-around avatar)
   (tell! (list "You are in" (get-location avatar))
          avatar)
   (let ((my-things (get-things avatar)))
     (if (n:pair? my-things)
-        (tell! (cons "Your bag contains:" my-things)
-               avatar)))
+      (tell! (cons "Your bag contains:" my-things)
+             avatar)))
   (let ((things
-         (append (things-here avatar)
-                 (people-here avatar))))
+          (append (things-here avatar)
+                  (people-here avatar))))
     (if (n:pair? things)
-        (tell! (cons "You see here:" things)
-               avatar)))
+      (tell! (cons "You see here:" things)
+             avatar)))
   (let ((vistas (vistas-here avatar)))
     (if (n:pair? vistas)
-        (tell! (cons "You can see:" vistas)
-               avatar)))
+      (tell! (cons "You can see:" vistas)
+             avatar)))
   (tell! (let ((exits (exits-here avatar)))
            (if (n:pair? exits)
-               (cons "You can exit:"
-                     (map get-direction exits))
-               '("There are no exits..."
-                 "you are dead and gone to heaven!")))
+             (cons "You can exit:"
+                   (map get-direction exits))
+             '("There are no exits..."
+               "you are dead and gone to heaven!")))
          avatar))
 
 ;;; Motion
@@ -497,116 +497,116 @@
 
 ;; coderef: generic-move:default
 (define-generic-procedure-handler generic-move!
-  (match-args thing? container? container? person?)
-  (lambda (thing from to actor)
-    (tell! (list thing "is not movable")
-           actor)))
+                                  (match-args thing? container? container? person?)
+                                  (lambda (thing from to actor)
+                                    (tell! (list thing "is not movable")
+                                           actor)))
 
 ;; coderef: generic-move:steal
 (define-generic-procedure-handler generic-move!
-  (match-args mobile-thing? bag? bag? person?)
-  (lambda (mobile-thing from to actor)
-    (let ((former-holder (get-holder from))
-          (new-holder (get-holder to)))
-      (cond ((eqv? from to)
-             (tell! (list new-holder "is already carrying"
-                          mobile-thing)
-                    actor))
-            ((eqv? actor former-holder)
-             (narrate! (list actor
-                             "gives" mobile-thing
-                             "to" new-holder)
-                       actor))
-            ((eqv? actor new-holder)
-             (narrate! (list actor
-                             "takes" mobile-thing
-                             "from" former-holder)
-                       actor))
-            (else
-             (narrate! (list actor
-                             "takes" mobile-thing
-                             "from" former-holder
-                             "and gives it to" new-holder)
-                       actor)))
-      (if (not (eqv? actor former-holder))
-          (say! former-holder (list "Yaaaah! I am upset!")))
-      (if (not (eqv? actor new-holder))
-          (say! new-holder (list "Whoa! Where'd you get this?")))
-      (if (not (eqv? from to))
-          (move-internal! mobile-thing from to)))))
+                                  (match-args mobile-thing? bag? bag? person?)
+                                  (lambda (mobile-thing from to actor)
+                                    (let ((former-holder (get-holder from))
+                                          (new-holder (get-holder to)))
+                                      (cond ((eqv? from to)
+                                             (tell! (list new-holder "is already carrying"
+                                                          mobile-thing)
+                                                    actor))
+                                            ((eqv? actor former-holder)
+                                             (narrate! (list actor
+                                                             "gives" mobile-thing
+                                                             "to" new-holder)
+                                                       actor))
+                                            ((eqv? actor new-holder)
+                                             (narrate! (list actor
+                                                             "takes" mobile-thing
+                                                             "from" former-holder)
+                                                       actor))
+                                            (else
+                                              (narrate! (list actor
+                                                              "takes" mobile-thing
+                                                              "from" former-holder
+                                                              "and gives it to" new-holder)
+                                                        actor)))
+                                      (if (not (eqv? actor former-holder))
+                                        (say! former-holder (list "Yaaaah! I am upset!")))
+                                      (if (not (eqv? actor new-holder))
+                                        (say! new-holder (list "Whoa! Where'd you get this?")))
+                                      (if (not (eqv? from to))
+                                        (move-internal! mobile-thing from to)))))
 
 ;; coderef: generic-move:take
 (define-generic-procedure-handler generic-move!
-  (match-args mobile-thing? place? bag? person?)
-  (lambda (mobile-thing from to actor)
-    (let ((new-holder (get-holder to)))
-      (cond ((eqv? actor new-holder)
-             (narrate! (list actor
-                             "picks up" mobile-thing)
-                       actor))
-            (else
-             (narrate! (list actor
-                             "picks up" mobile-thing
-                             "and gives it to" new-holder)
-                       actor)))
-      (if (not (eqv? actor new-holder))
-          (say! new-holder (list "Whoa! Thanks, dude!")))
-      (move-internal! mobile-thing from to))))
+                                  (match-args mobile-thing? place? bag? person?)
+                                  (lambda (mobile-thing from to actor)
+                                    (let ((new-holder (get-holder to)))
+                                      (cond ((eqv? actor new-holder)
+                                             (narrate! (list actor
+                                                             "picks up" mobile-thing)
+                                                       actor))
+                                            (else
+                                              (narrate! (list actor
+                                                              "picks up" mobile-thing
+                                                              "and gives it to" new-holder)
+                                                        actor)))
+                                      (if (not (eqv? actor new-holder))
+                                        (say! new-holder (list "Whoa! Thanks, dude!")))
+                                      (move-internal! mobile-thing from to))))
 
 ;; coderef: generic-move:drop
 (define-generic-procedure-handler generic-move!
-  (match-args mobile-thing? bag? place? person?)
-  (lambda (mobile-thing from to actor)
-    (let ((former-holder (get-holder from)))
-      (cond ((eqv? actor former-holder)
-             (narrate! (list actor
-                             "drops" mobile-thing)
-                       actor))
-            (else
-             (narrate! (list actor
-                             "takes" mobile-thing
-                             "from" former-holder
-                             "and drops it")
-                       actor)))
-      (if (not (eqv? actor former-holder))
-          (say! former-holder
-                (list "What did you do that for?")))
-      (move-internal! mobile-thing from to))))
+                                  (match-args mobile-thing? bag? place? person?)
+                                  (lambda (mobile-thing from to actor)
+                                    (let ((former-holder (get-holder from)))
+                                      (cond ((eqv? actor former-holder)
+                                             (narrate! (list actor
+                                                             "drops" mobile-thing)
+                                                       actor))
+                                            (else
+                                              (narrate! (list actor
+                                                              "takes" mobile-thing
+                                                              "from" former-holder
+                                                              "and drops it")
+                                                        actor)))
+                                      (if (not (eqv? actor former-holder))
+                                        (say! former-holder
+                                              (list "What did you do that for?")))
+                                      (move-internal! mobile-thing from to))))
 
 (define-generic-procedure-handler generic-move!
-  (match-args mobile-thing? place? place? person?)
-  (lambda (mobile-thing from to actor)
-    (cond ((eqv? from to)
-           (tell! (list mobile-thing "is already in" from)
-                  actor))
-          (else
-           (tell! (list "How do you propose to move"
-                        mobile-thing
-                        "without carrying it?")
-                  actor)))))
+                                  (match-args mobile-thing? place? place? person?)
+                                  (lambda (mobile-thing from to actor)
+                                    (cond ((eqv? from to)
+                                           (tell! (list mobile-thing "is already in" from)
+                                                  actor))
+                                          (else
+                                            (tell! (list "How do you propose to move"
+                                                         mobile-thing
+                                                         "without carrying it?")
+                                                   actor)))))
 
 ;; coderef: generic-move:person
 (define-generic-procedure-handler generic-move!
-  (match-args person? place? place? person?)
-  (lambda (person from to actor)
-    (let ((exit (find-exit from to)))
-      (cond ((or (eqv? from (get-heaven))
-                 (eqv? to (get-heaven)))
-             (move-internal! person from to))
-            ((not exit)
-             (tell! (list "There is no exit from" from
-                          "to" to)
-                    actor))
-            ((eqv? person actor)
-             (narrate! (list person "leaves via the"
-                             (get-direction exit) "exit")
-                       from)
-             (move-internal! person from to))
-            (else
-             (tell! (list "You can't force"
-                          person
-                          "to move!")
-                    actor))))))
+                                  (match-args person? place? place? person?)
+                                  (lambda (person from to actor)
+                                    (let ((exit (find-exit from to)))
+                                      (cond ((or (eqv? from (get-heaven))
+                                                 (eqv? to (get-heaven)))
+                                             (move-internal! person from to))
+                                            ((not exit)
+                                             (tell! (list "There is no exit from" from
+                                                          "to" to)
+                                                    actor))
+                                            ((eqv? person actor)
+                                             (narrate! (list person "leaves via the"
+                                                             (get-direction exit) "exit")
+                                                       from)
+                                             (move-internal! person from to))
+                                            (else
+                                              (tell! (list "You can't force"
+                                                           person
+                                                           "to move!")
+                                                     actor))))))
 
 (define (find-exit from to)
   (find (lambda (exit)

@@ -7,8 +7,8 @@
 ;;; It also has a property list.
 
 (define-record-type <package>
-    (%make-package name bindings-alist)
-    package?
+  (%make-package name bindings-alist)
+  package?
   (name package-debug-name)
   (bindings-alist package-bindings))
 
@@ -23,8 +23,8 @@
 (define (package-value package name)
   (let ((p (assq name (package-bindings package))))
     (if p
-        (cdr p)
-        (error "Unknown binding name:" name))))
+      (cdr p)
+      (error "Unknown binding name:" name))))
 
 (define (similar-packages? p1 p2)
   (lset= eq? (package-names p1) (package-names p2)))
@@ -33,15 +33,15 @@
 (define (package-installer environment)
   (lambda (package)
     (make-package
-     (list 'uninstall (package-debug-name package))
-     (map (lambda (binding)
-            (let ((name (car binding))
-                  (value (cdr binding)))
-              (let ((old-value
-                     (environment-lookup environment name)))
-                (environment-define environment name value)
-                (cons name old-value))))
-          (package-bindings package)))))
+      (list 'uninstall (package-debug-name package))
+      (map (lambda (binding)
+             (let ((name (car binding))
+                   (value (cdr binding)))
+               (let ((old-value
+                       (environment-lookup environment name)))
+                 (environment-define environment name value)
+                 (cons name old-value))))
+           (package-bindings package)))))
 
 ;;; **** Implement package-uninstaller and uninstall-package!.
 
@@ -59,5 +59,5 @@
 
 ;;; This is MIT/GNU Scheme specific:
 (define-record-printer <package>
-  (lambda (package)
-    (list (package-debug-name package))))
+                       (lambda (package)
+                         (list (package-debug-name package))))

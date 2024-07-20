@@ -43,20 +43,20 @@
 (define (eg-receiver dh-system)         ;ElGamal receiver
   (let ((k (dh-system-size dh-system)) (p (dh-system-prime dh-system)))
     (let ((my-secret (random-k-digit-number k))
-	  (mod-expt (exptmod p))
-	  (mod-* (modular p *))
-	  (mod-inv (inversemod p)))
+          (mod-expt (exptmod p))
+          (mod-* (modular p *))
+          (mod-inv (inversemod p)))
       (let ((advertised-number
-	     (mod-expt (dh-system-primitive-root dh-system) my-secret)))
-	(let ((public-key
-	       (eg-make-public-key dh-system advertised-number))
-	      (decryption-procedure
-	       (lambda (ciphertext)
-		 (let ((x (eg-ciphertext-x ciphertext))
-		       (y (eg-ciphertext-y ciphertext)))
-		   (let ((m (mod-* y (mod-inv (mod-expt x my-secret)))))
-		     (integer->string m))))))
-	  (eg-make-receiver public-key decryption-procedure))))))
+              (mod-expt (dh-system-primitive-root dh-system) my-secret)))
+        (let ((public-key
+                (eg-make-public-key dh-system advertised-number))
+              (decryption-procedure
+                (lambda (ciphertext)
+                  (let ((x (eg-ciphertext-x ciphertext))
+                        (y (eg-ciphertext-y ciphertext)))
+                    (let ((m (mod-* y (mod-inv (mod-expt x my-secret)))))
+                      (integer->string m))))))
+          (eg-make-receiver public-key decryption-procedure))))))
 
 (define (eg-send-message message receiver)
   YOUR CODE HERE)
@@ -111,16 +111,16 @@
 
 (define (Eve receiver)
   (let ((receiver-public-key
-	 (eg-receiver-public-key receiver))
-	(receiver-decryption-procedure
-	 (eg-receiver-decryption-procedure receiver)))
+          (eg-receiver-public-key receiver))
+        (receiver-decryption-procedure
+          (eg-receiver-decryption-procedure receiver)))
     (let ((my-spying-procedure
-	   (lambda (ciphertext)
-	     (write ciphertext)
-	     (newline)
-	     (receiver-decryption-procedure ciphertext))))
+            (lambda (ciphertext)
+              (write ciphertext)
+              (newline)
+              (receiver-decryption-procedure ciphertext))))
       (eg-make-receiver receiver-public-key
-			my-spying-procedure))))
+                        my-spying-procedure))))
 
 ;;; The rest of this file is code you may find useful.
 
@@ -134,8 +134,8 @@
   (let ((*mod (modular n *)))
     (define (em a b)
       (if (= b 0)
-          1
-          (*mod a (em a (- b 1)))))
+        1
+        (*mod a (em a (- b 1)))))
     em))
 
 
@@ -154,8 +154,8 @@
 (define slow-prime?
   (lambda (n)
     (if (< n 2)
-        #f
-        (test-factors n 2))))
+      #f
+      (test-factors n 2))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;
@@ -171,8 +171,8 @@
   ;; The last term creates a leading 1, which allows us to distinguish
   ;; between lists with trailing zeros.
   (if (null? list)
-      1
-      (+ (car list) (* radix (join-numbers (cdr list) radix)))))
+    1
+    (+ (car list) (* radix (join-numbers (cdr list) radix)))))
 
 ;;; test cases
 ;;;(join-numbers '(3 20 39 48) 100) ;-> 148392003
@@ -185,9 +185,9 @@
   ;; that
   ;;    n = i_0 + i_1*radix + i_2*radix2 + ... i_k*radix^k + radix^(k+1)
   (if (<= n 1)
-      '()
-      (cons (remainder n radix)
-            (split-number (quotient n radix) radix))))
+    '()
+    (cons (remainder n radix)
+          (split-number (quotient n radix) radix))))
 
 ;;; test cases
 ;;;(split-number (join-numbers '(3 20 39 48) 100) 100) ;-> (3 20 39 48)
@@ -199,16 +199,16 @@
 
 (define (split-number n radix)
   (if (< n 1) '()
-      (cons (remainder n radix)
-	    (split-number (quotient n radix) radix))))
+    (cons (remainder n radix)
+          (split-number (quotient n radix) radix))))
 
 (define (join-numbers digits radix)
   (reduce 
-   + 0
-   (map 
-    (lambda (place digit)
-      (* digit (expt radix place)))
-    (iota (length digits)) digits)))
+    + 0
+    (map 
+      (lambda (place digit)
+        (* digit (expt radix place)))
+      (iota (length digits)) digits)))
 ;;; Test cases are similar to above except that they don't have
 ;;; leading ones.
 
@@ -219,16 +219,16 @@
   ;; encoded as a three-byte sequence, 255 <low byte> <high byte>.
   (lambda (chars)
     (if (null? chars)
-        '()
-        (let ((c (char->integer (car chars))))
-          (if (< c 255)
-              (cons c (chars->bytes (cdr chars)))
-              (let ((lowbyte (remainder c 256))
-                    (highbyte  (quotient c 256)))
-                (cons 255
-		      (cons lowbyte
-			    (cons highbyte
-				  (chars->bytes (cdr chars)))))))))))
+      '()
+      (let ((c (char->integer (car chars))))
+        (if (< c 255)
+          (cons c (chars->bytes (cdr chars)))
+          (let ((lowbyte (remainder c 256))
+                (highbyte  (quotient c 256)))
+            (cons 255
+                  (cons lowbyte
+                        (cons highbyte
+                              (chars->bytes (cdr chars)))))))))))
 
 ;;; test cases
 ;;;(chars->bytes (string->list "hello")) ; -> (104 101 108 108 111)
@@ -245,15 +245,15 @@
   ;; <high-byte> are converted to a 16-bit Unicode character.
   (lambda (bytes)
     (if (null? bytes)
-        '()
-        (let ((b (car bytes)))
-          (if (< b 255)
-              (cons (integer->char b)
-                    (bytes->chars (cdr bytes)))
-              (let ((lowbyte (cadr bytes))
-                    (highbyte (caddr bytes)))
-                (cons (integer->char (+ lowbyte (* highbyte 256)))
-                      (bytes->chars (cdddr bytes)))))))))
+      '()
+      (let ((b (car bytes)))
+        (if (< b 255)
+          (cons (integer->char b)
+                (bytes->chars (cdr bytes)))
+          (let ((lowbyte (cadr bytes))
+                (highbyte (caddr bytes)))
+            (cons (integer->char (+ lowbyte (* highbyte 256)))
+                  (bytes->chars (cdddr bytes)))))))))
 
 ;;; test cases
 ;;;(bytes->chars '(104 101 108 108 111)) ; -> (#\h #\e #\l #\l #\o)

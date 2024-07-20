@@ -18,8 +18,8 @@
 (define (operator->procedure-name operator)
   (let ((p (assq operator internal-operators)))
     (if p
-        (cdr p)
-        operator)))
+      (cdr p)
+      operator)))
 
 (define internal-operators
   '((negate . -)
@@ -37,12 +37,12 @@
 
 (define (operator-signature operator domain)
   (let ((mapper
-         (lambda (indicator)
-           (case indicator
-             ((domain) domain)
-             ((boolean) boolean?)
-             ((number) number?)
-             (else (error "Unknown domain:" indicator))))))
+          (lambda (indicator)
+            (case indicator
+              ((domain) domain)
+              ((boolean) boolean?)
+              ((number) number?)
+              (else (error "Unknown domain:" indicator))))))
     (values (map mapper (operator-domains operator))
             (mapper (operator-codomain operator)))))
 

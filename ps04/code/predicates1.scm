@@ -17,14 +17,14 @@
   (guarantee have-compound-operator-registrar? operator)
   (guarantee n:list? components)
   (tag->predicate
-   ((get-compound-operator-registrar operator)
-    joint-predicate
-    operator
-    (map predicate->tag components))))
+    ((get-compound-operator-registrar operator)
+     joint-predicate
+     operator
+     (map predicate->tag components))))
 
 (define (make-simple-predicate name data-test tagging-strategy)
   (tag->predicate
-   (make-simple-tag name data-test tagging-strategy)))
+    (make-simple-tag name data-test tagging-strategy)))
 
 (define (simple-abstract-predicate name data-test)
   (make-simple-predicate name data-test tagging-strategy:always))
@@ -46,71 +46,71 @@
 
 (define (make-listish-memoizer)
   (simple-list-memoizer eq? hash-by-identity
-    (lambda (data-test operator tags)
-      tags)
-    (lambda (data-test operator tags)
-      (standard-compound-tag data-test operator tags))))
+                        (lambda (data-test operator tags)
+                          tags)
+                        (lambda (data-test operator tags)
+                          (standard-compound-tag data-test operator tags))))
 
 (define-compound-operator-registrar 'is-list-of
-  (make-listish-memoizer))
+                                    (make-listish-memoizer))
 
 (define-compound-operator-registrar 'is-non-empty-list-of
-  (make-listish-memoizer))
+                                    (make-listish-memoizer))
 
 (define-compound-operator-registrar 'is-pair-of
-  (make-listish-memoizer))
+                                    (make-listish-memoizer))
 
 (define (joinish wrap-constructor)
   (let ((memoizer
-         (simple-lset-memoizer eq? hash-by-identity
-           (lambda (data-test operator tags post-process)
-             tags)
-           (lambda (data-test operator tags post-process)
-             (let ((joint-tag
-                    (standard-compound-tag data-test
-                                           operator
-                                           tags)))
-               (post-process joint-tag tags)
-               joint-tag)))))
+          (simple-lset-memoizer eq? hash-by-identity
+                                (lambda (data-test operator tags post-process)
+                                  tags)
+                                (lambda (data-test operator tags post-process)
+                                  (let ((joint-tag
+                                          (standard-compound-tag data-test
+                                                                 operator
+                                                                 tags)))
+                                    (post-process joint-tag tags)
+                                    joint-tag)))))
     (lambda (data-test operator tags)
       (let ((tags
-             (delete-duplicates
-              (append-map
-               (lambda (tag)
-                 (if (and (compound-tag? tag)
-                          (eq? operator
-                               (compound-tag-operator tag)))
-                     (compound-tag-components tag)
-                     (list tag)))
-               tags)
-              eq?)))
+              (delete-duplicates
+                (append-map
+                  (lambda (tag)
+                    (if (and (compound-tag? tag)
+                             (eq? operator
+                                  (compound-tag-operator tag)))
+                      (compound-tag-components tag)
+                      (list tag)))
+                  tags)
+                eq?)))
         (if (and (pair? tags) (null? (cdr tags)))
-            (car tags)
-            (wrap-constructor
-             tags
-             (lambda (post-process)
-               (memoizer data-test operator tags
-                         post-process))))))))
+          (car tags)
+          (wrap-constructor
+            tags
+            (lambda (post-process)
+              (memoizer data-test operator tags
+                        post-process))))))))
 
 (define-compound-operator-registrar 'disjoin
-  (joinish
-   (lambda (tags continue)
-     (or (find top-tag? tags)
-         (continue
-          (lambda (joint-tag tags)
-            (for-each (lambda (tag)
-                        (set-tag<=! tag joint-tag))
-                      tags)))))))
+                                    (joinish
+                                      (lambda (tags continue)
+                                        (or (find top-tag? tags)
+                                            (continue
+                                              (lambda (joint-tag tags)
+                                                (for-each (lambda (tag)
+                                                            (set-tag<=! tag joint-tag))
+                                                          tags)))))))
 
 (define-compound-operator-registrar 'conjoin
-  (joinish
-   (lambda (tags continue)
-     (or (find bottom-tag? tags)
-         (continue
-          (lambda (joint-tag tags)
-            (for-each (lambda (tag)
-                        (set-tag<=! joint-tag tag))
-                      tags)))))))
+                                    (joinish
+                                      (lambda (tags continue)
+                                        (or (find bottom-tag? tags)
+                                            (continue
+                                              (lambda (joint-tag tags)
+                                                (for-each (lambda (tag)
+                                                            (set-tag<=! joint-tag tag))
+                                                          tags)))))))
 
 ;;;; Generic predicate operations
 
@@ -191,32 +191,32 @@
   (simple-generic-procedure 'get-tag-shared 1))
 
 (define-generic-procedure-default-handler tag?
-  (lambda (object) #f))
+                                          (lambda (object) #f))
 
 (define (define-tag-type predicate get-shared)
   (define-generic-procedure-handler tag? (match-args predicate)
-    (lambda (object)
-      #t))
+                                    (lambda (object)
+                                      #t))
   (define-generic-procedure-handler get-tag-shared
                                     (match-args predicate)
-    get-shared))
+                                    get-shared))
 
 (define (define-tag-record-printer record-type)
   (define-record-printer record-type
-    (lambda (tag) (list (tag-name tag)))))
+                         (lambda (tag) (list (tag-name tag)))))
 
 (define (%invoke-tagging-strategy tagging-strategy name data-test
                                   maker)
   (tagging-strategy
-   name
-   data-test
-   (lambda (predicate constructor accessor)
-     (let ((tag
-            (maker
-             (make-tag-shared name predicate constructor
-                              accessor))))
-       (set-predicate-metadata! predicate tag)
-       tag))))
+    name
+    data-test
+    (lambda (predicate constructor accessor)
+      (let ((tag
+              (maker
+                (make-tag-shared name predicate constructor
+                                 accessor))))
+        (set-predicate-metadata! predicate tag)
+        tag))))
 
 (define (make-tag-shared name predicate constructor accessor)
   (guarantee procedure? predicate 'make-tag-shared)
@@ -226,9 +226,9 @@
                     (make-weak-eq-set)))
 
 (define-record-type <tag-shared>
-    (%make-tag-shared name predicate constructor accessor
-                      supersets)
-    tag-shared?
+  (%make-tag-shared name predicate constructor accessor
+                    supersets)
+  tag-shared?
   (name tag-shared-name)
   (predicate tag-shared-predicate)
   (constructor tag-shared-constructor)
@@ -240,8 +240,8 @@
                             %make-simple-tag))
 
 (define-record-type <simple-tag>
-    (%make-simple-tag shared)
-    simple-tag?
+  (%make-simple-tag shared)
+  simple-tag?
   (shared simple-tag-shared))
 
 (define-tag-type simple-tag? simple-tag-shared)
@@ -256,8 +256,8 @@
                                                   components))))
 
 (define-record-type <compound-tag>
-    (%make-compound-tag shared operator components)
-    compound-tag?
+  (%make-compound-tag shared operator components)
+  compound-tag?
   (shared compound-tag-shared)
   (operator compound-tag-operator)
   (components compound-tag-components))
@@ -274,8 +274,8 @@
                                                     bindings))))
 
 (define-record-type <parametric-tag>
-    (%make-parametric-tag shared template bindings)
-    parametric-tag?
+  (%make-parametric-tag shared template bindings)
+  parametric-tag?
   (shared parametric-tag-shared)
   (template parametric-tag-template)
   (bindings parametric-tag-bindings))
@@ -309,24 +309,24 @@
 (define (get-all-tag-supersets tag)
   (let loop ((queue (list tag)) (supersets '()))
     (if (pair? queue)
-        (let ((tag (car queue))
-              (queue (cdr queue)))
-          (let ((new-sets
-                 (lset-difference eqv?
-                                  (get-tag-supersets tag)
-                                  supersets)))
-            (if (pair? new-sets)
-                (loop (append new-sets queue)
-                      (append new-sets supersets))
-                (loop queue supersets))))
-        supersets)))
+      (let ((tag (car queue))
+            (queue (cdr queue)))
+        (let ((new-sets
+                (lset-difference eqv?
+                                 (get-tag-supersets tag)
+                                 supersets)))
+          (if (pair? new-sets)
+            (loop (append new-sets queue)
+                  (append new-sets supersets))
+            (loop queue supersets))))
+      supersets)))
 
 (define (set-tag<=! tag superset)
   (if (tag>= tag superset)
-      (error "Not allowed to create a superset loop:"
-             tag superset))
+    (error "Not allowed to create a superset loop:"
+           tag superset))
   (if (not (tag<= tag superset))
-      (((tag-supersets tag) 'add-element!) superset)))
+    (((tag-supersets tag) 'add-element!) superset)))
 
 (define (tag= tag1 tag2)
   (guarantee tag? tag1)
@@ -343,12 +343,12 @@
 
 (define internal-tag<=
   (memoize-multi-arg-eqv
-   (lambda (tag1 tag2)
-     (or (eqv? tag1 tag2)
-         (generic-tag<= tag1 tag2)
-         (any (lambda (tag)
-                (internal-tag<= tag tag2))
-              (get-tag-supersets tag1))))))
+    (lambda (tag1 tag2)
+      (or (eqv? tag1 tag2)
+          (generic-tag<= tag1 tag2)
+          (any (lambda (tag)
+                 (internal-tag<= tag tag2))
+               (get-tag-supersets tag1))))))
 
 (define (internal-tag>= tag1 tag2)
   (internal-tag<= tag2 tag1))
@@ -358,8 +358,8 @@
 
 (define (define-tag<= predicate1 predicate2 handler)
   (define-generic-procedure-handler generic-tag<=
-    (match-args predicate1 predicate2)
-    handler))
+                                    (match-args predicate1 predicate2)
+                                    handler))
 
 (define (false-tag<= tag1 tag2) #f)
 (define (true-tag<= tag1 tag2) #t)
@@ -375,7 +375,7 @@
 (define bottom-tag #f)
 
 (define-generic-procedure-default-handler generic-tag<=
-  false-tag<=)
+                                          false-tag<=)
 
 (define-tag<= bottom-tag? tag? true-tag<=)
 (define-tag<= tag? top-tag? true-tag<=)
@@ -384,34 +384,34 @@
 (define-tag<= top-tag? non-top-tag? false-tag<=)
 
 (define-tag<= parametric-tag? parametric-tag?
-  (lambda (tag1 tag2)
-    (and (eqv? (parametric-tag-template tag1)
-               (parametric-tag-template tag2))
-         (every (lambda (bind1 bind2)
-                  (let ((tags1 (parameter-binding-values bind1))
-                        (tags2 (parameter-binding-values bind2)))
-                    (and (n:= (length tags1) (length tags2))
-                         (every (case (parameter-binding-polarity
-                                       bind1)
-                                  ((+) internal-tag<=)
-                                  ((-) internal-tag>=)
-                                  (else tag=))
-                                tags1
-                                tags2))))
-                (parametric-tag-bindings tag1)
-                (parametric-tag-bindings tag2)))))
+              (lambda (tag1 tag2)
+                (and (eqv? (parametric-tag-template tag1)
+                           (parametric-tag-template tag2))
+                     (every (lambda (bind1 bind2)
+                              (let ((tags1 (parameter-binding-values bind1))
+                                    (tags2 (parameter-binding-values bind2)))
+                                (and (n:= (length tags1) (length tags2))
+                                     (every (case (parameter-binding-polarity
+                                                    bind1)
+                                              ((+) internal-tag<=)
+                                              ((-) internal-tag>=)
+                                              (else tag=))
+                                            tags1
+                                            tags2))))
+                            (parametric-tag-bindings tag1)
+                            (parametric-tag-bindings tag2)))))
 
 (define-tag<= compound-tag? compound-tag?
-  (lambda (tag1 tag2)
-    (cond ((and (eq? 'disjoin (compound-tag-operator tag1))
-                (eq? 'disjoin (compound-tag-operator tag2)))
-           (every (lambda (component1)
-                    (any (lambda (component2)
-                           (tag<= component1 component2))
-                         (compound-tag-components tag2)))
-                  (compound-tag-components tag1)))
-          ;; TODO(cph): add more rules here.
-          (else #f))))
+              (lambda (tag1 tag2)
+                (cond ((and (eq? 'disjoin (compound-tag-operator tag1))
+                            (eq? 'disjoin (compound-tag-operator tag2)))
+                       (every (lambda (component1)
+                                (any (lambda (component2)
+                                       (tag<= component1 component2))
+                                     (compound-tag-components tag2)))
+                              (compound-tag-components tag1)))
+                      ;; TODO(cph): add more rules here.
+                      (else #f))))
 
 ;;;; Registrations for this file
 

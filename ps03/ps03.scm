@@ -10,11 +10,11 @@
 
 (define (ensure-vector-lengths-match vecs)
   ( let (( first-vec-length ( vector-length ( car vecs ))))
-    ( if ( any ( lambda ( v)
-		 ( not (n:= ( vector-length v)
-			  first-vec-length )))
-	       vecs)
-	 (error "Vector dimension mismatch:" vecs))))
+        ( if ( any ( lambda ( v)
+                            ( not (n:= ( vector-length v)
+                                       first-vec-length )))
+                   vecs)
+             (error "Vector dimension mismatch:" vecs))))
 
 (define (vector-element-wise element-procedure)
   (lambda vecs
@@ -29,7 +29,7 @@
 (define (v:+ vector1 vector2)
   (ensure-vector-lengths-match (list vector1 vector2))
   (list->vector
-   (map sum (zip (vector->list vector1) (vector->list vector2)))))
+    (map sum (zip (vector->list vector1) (vector->list vector2)))))
 
 (v:+ #(1 2 3) #(4 5 6))
 ;Value 181: #(5 7 9)
@@ -54,30 +54,30 @@
   (ensure-vector-lengths-match (list vector1 vector2))
   (let ((product (lambda (l) (reduce * 1 l))))
     (sum
-     (map product (zip (vector->list vector1) (vector->list vector2))))))
+      (map product (zip (vector->list vector1) (vector->list vector2))))))
 
 (define (v:magnitude vector)
   (sqrt (v:dot vector vector)))
 
 (define (vector-extender base-arithmetic)
   (make-arithmetic 'vector vector? (list base-arithmetic)
-    (lambda (name base-constant)
-      base-constant)
-    (let ((base-predicate
-	   (arithmetic-domain-predicate base-arithmetic)))
-      (lambda (operator base-operation)
-	(simple-operation
-	  operator
-	  vector?
-	  (case operator
-	    ((+) (lambda (x y) (v:+ x y)))
-	    ((-) (lambda (x y) (v:- x y)))
-	    ((*) (lambda (x y) (v:dot x y)))
-	    ((negate) (lambda (x) (v:negate x)))
-	    ((magnitude) (lambda (x) (v:magnitude x)))
-	    (else
-	     (lambda args
-	       (error "Operator undefined in Vector" operator)))))))))
+                   (lambda (name base-constant)
+                     base-constant)
+                   (let ((base-predicate
+                           (arithmetic-domain-predicate base-arithmetic)))
+                     (lambda (operator base-operation)
+                       (simple-operation
+                         operator
+                         vector?
+                         (case operator
+                           ((+) (lambda (x y) (v:+ x y)))
+                           ((-) (lambda (x y) (v:- x y)))
+                           ((*) (lambda (x y) (v:dot x y)))
+                           ((negate) (lambda (x) (v:negate x)))
+                           ((magnitude) (lambda (x) (v:magnitude x)))
+                           (else
+                             (lambda args
+                               (error "Operator undefined in Vector" operator)))))))))
 
 
 
@@ -121,11 +121,11 @@ Tests:
 
 (define vector-new (simple-generic-procedure 'vector-new 2))
 (define-generic-procedure-handler vector-new
-  (all-args 2 (disjoin number? symbol? list?))
-  (lambda (a b) (n:vector a b)))
+                                  (all-args 2 (disjoin number? symbol? list?))
+                                  (lambda (a b) (n:vector a b)))
 (define-generic-procedure-handler vector-new
-  (all-args 2 function?)
-  (lambda (a b) (lambda (x) (vector-new (a x) (b x)))))
+                                  (all-args 2 function?)
+                                  (lambda (a b) (lambda (x) (vector-new (a x) (b x)))))
 |#
 
 #|
@@ -144,7 +144,7 @@ Tests:
 
 
 ; We can even have vectors of (functions that return functions)!
- 
+
 (define cos-mult
   (lambda (a)
     (lambda (x)
@@ -198,17 +198,17 @@ This does have a couple of shortcomings:
 
 (define (symbolic-extender base-arithmetic)
   (make-arithmetic 'symbolic symbolic? (list base-arithmetic)
-    (lambda (name base-constant)
-      (default-object))
-    (let ((base-predicate
-           (arithmetic-domain-predicate base-arithmetic)))
-      (lambda (operator base-operation)
-        (make-operation operator
-                        (any-arg (operator-arity operator)
-                                 symbolic?
-                                 base-predicate)
-                        (lambda args (cons operator args)))))))
-						
+                   (lambda (name base-constant)
+                     (default-object))
+                   (let ((base-predicate
+                           (arithmetic-domain-predicate base-arithmetic)))
+                     (lambda (operator base-operation)
+                       (make-operation operator
+                                       (any-arg (operator-arity operator)
+                                                symbolic?
+                                                base-predicate)
+                                       (lambda args (cons operator args)))))))
+
 (define g (make-generic-arithmetic simple-generic-dispatcher))
 (add-to-generic-arithmetic! g (symbolic-extender numeric-arithmetic))
 (install-arithmetic! g)
@@ -338,23 +338,23 @@ By memoizing disjoin and conjoin, we can make sure that these mathematically ide
     (add-to-generic-arithmetic! g numeric-arithmetic)
     (extend-generic-arithmetic! g function-extender)
     (add-to-generic-arithmetic! g 
-				(symbolic-extender numeric-arithmetic))
+                                (symbolic-extender numeric-arithmetic))
     g))
 
 (define trie-full-generic-arithmetic
   (let ((g (make-generic-arithmetic trie-generic-dispatcher)))
     (add-to-generic-arithmetic! g numeric-arithmetic)
     (add-to-generic-arithmetic! g
-      (symbolic-extender numeric-arithmetic))
+                                (symbolic-extender numeric-arithmetic))
     (extend-generic-arithmetic! g function-extender)
     g))
 
- (install-arithmetic! full-generic-arithmetic)
+(install-arithmetic! full-generic-arithmetic)
 
 (define (fib n)
   (if (< n 2)
-      n
-      (+ (fib (- n 1)) (fib (- n 2)))))
+    n
+    (+ (fib (- n 1)) (fib (- n 2)))))
 
 ; (install-arithmetic! trie-full-generic-arithmetic)
 
@@ -418,18 +418,18 @@ On the other hand, if there are many rules which share a common pre-fix, then tr
 
 (define (cached-generic-dispatcher get-key)
   (make-cached-generic-dispatcher (simple-generic-dispatcher)
-				  get-key))
+                                  get-key))
 
 (define (make-cached-generic-dispatcher base-dispatcher get-key)
   (let ((get-handler
-	 (simple-list-memoizer eqv?
-			       hash-by-eqv
-			       (lambda (args) (map get-key args))
-			       (base-dispatcher 'get-handler))))
+          (simple-list-memoizer eqv?
+                                hash-by-eqv
+                                (lambda (args) (map get-key args))
+                                (base-dispatcher 'get-handler))))
     (lambda (message)
       (case message
-	((get-handler) get-handler)
-	(else (base-dispatcher message))))))
+        ((get-handler) get-handler)
+        (else (base-dispatcher message))))))
 
 (let ((g (make-generic-arithmetic generic-dispatcher)))
   (add-to-generic-arithmetic! g numeric-arithmetic)
@@ -441,8 +441,8 @@ On the other hand, if there are many rules which share a common pre-fix, then tr
 
 (define (fib n)
   (if (< n 2)
-      n
-      (+ (fib (- n 1)) (fib (- n 2)))))
+    n
+    (+ (fib (- n 1)) (fib (- n 2)))))
 
 (with-predicate-counts ( lambda () ( fib 20) ))
 

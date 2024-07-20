@@ -11,19 +11,19 @@
 ;;; Tests for Problem 1.1 (test-1.1.txt is attached)
 
 (r:grep 
- (r:seq
-  (r:bol)
-  (r:* (r:quote "abc"))
-  (r:eol))
- "test-1.1.txt")
+  (r:seq
+    (r:bol)
+    (r:* (r:quote "abc"))
+    (r:eol))
+  "test-1.1.txt")
 ;Value 25: ("abcabcabc" "abc" "")
 
 (r:grep
- (r:seq
-  (r:bol)
-  (r:+ (r:quote "abc"))
-  (r:eol))
- "test-1.1.txt")
+  (r:seq
+    (r:bol)
+    (r:+ (r:quote "abc"))
+    (r:eol))
+  "test-1.1.txt")
 ;Value 26: ("abcabcabc" "abc")
 
 ;;; Problem 1.2
@@ -36,52 +36,52 @@
 
 (define (r:repeat min max expr)
   (apply r:seq
-	 (list
-	  expr
-	  "\\\{"
-	  (number->string min)
-	  ","
-	  (if max
-	      (number->string max)
-	      "")
-	  "\\\}")))
+         (list
+           expr
+           "\\\{"
+           (number->string min)
+           ","
+           (if max
+             (number->string max)
+             "")
+           "\\\}")))
 
 ; Tests
 
 
 (r:grep
- (r:seq
-  (r:bol)
-  (r:repeat 1 2 (r:quote "abc"))
-  (r:eol))
- "test-1.1.txt")
+  (r:seq
+    (r:bol)
+    (r:repeat 1 2 (r:quote "abc"))
+    (r:eol))
+  "test-1.1.txt")
 ;Value 38: ("abc")
 
 (r:grep
- (r:seq
-  (r:bol)
-  (r:repeat 0 2 (r:quote "abc"))
-  (r:eol))
- "test-1.1.txt")
+  (r:seq
+    (r:bol)
+    (r:repeat 0 2 (r:quote "abc"))
+    (r:eol))
+  "test-1.1.txt")
 ;Value 39: ("abc" "")
 
 (r:grep
- (r:seq
-  (r:bol)
-  (r:repeat 1 #f (r:quote "abc"))
-  (r:eol))
- "test-1.1.txt")
+  (r:seq
+    (r:bol)
+    (r:repeat 1 #f (r:quote "abc"))
+    (r:eol))
+  "test-1.1.txt")
 ;Value 40: ("abcabcabc" "abc")
 
 
 ; 1.3 Optimization 
 
 (define (r:quote string)
-   (list->string
+  (list->string
     (append-map (lambda (char)
                   (if (memv char chars-needing-quoting)
-                      (list #\\ char)
-                      (list char)))
+                    (list #\\ char)
+                    (list char)))
                 (string->list string))))
 
 ; test
@@ -95,10 +95,10 @@
   (case standard
     ('ere
      (and (string=? "(" (string-head expr 1))
-	  (string=? ")" (string-tail expr (- (string-length expr) 1)))))
+          (string=? ")" (string-tail expr (- (string-length expr) 1)))))
     ('bre
      (and (string=? "\\(" (string-head expr 2))
-	  (string=? "\\)" (string-tail expr (- (string-length expr) 2)))))))
+          (string=? "\\)" (string-tail expr (- (string-length expr) 2)))))))
 
 (define (bracketed? expr)
   (and (string=? "\[" (string-head expr 1))
@@ -106,11 +106,11 @@
 
 (define (parenthesize-if-needed expr)
   (if (or
-       (= (string-length expr) 1)
-       (parenthesized? expr)
-       (bracketed? expr))
-      expr
-      (parenthesize expr)))
+        (= (string-length expr) 1)
+        (parenthesized? expr)
+        (bracketed? expr))
+    expr
+    (parenthesize expr)))
 
 ; test
 
@@ -125,42 +125,42 @@
 
 (define (r:repeat min max expr)
   (string-append
-   (parenthesize-if-needed expr)
-   "\\\{"
-   (number->string min)
-   ","
-   (if max
-       (number->string max)
-       "")
-   "\\\}"))
+    (parenthesize-if-needed expr)
+    "\\\{"
+    (number->string min)
+    ","
+    (if max
+      (number->string max)
+      "")
+    "\\\}"))
 
 ; tests
 
 (r:seq (r:quote "a") (r:dot) (r:quote "c") 
        (r:seq (r:* (r:quote "x"))
-	      (r:repeat 1 5 (r:char-from "def"))))
+              (r:repeat 1 5 (r:char-from "def"))))
 ;Value 113: "\\(a.c\\(x\\{0,\\}[def]\\{1,5\\}\\)\\)"
 
 
 (r:seq (r:quote "a") (r:dot) (r:quote "c") 
        (r:seq (r:* (r:quote "xy"))
-	      (r:repeat 1 5 (r:char-from "def"))))
+              (r:repeat 1 5 (r:char-from "def"))))
 ;Value 114: "\\(a.c\\(\\(xy\\)\\{0,\\}[def]\\{1,5\\}\\)\\)"
 
 #|
- Considerations / subtle cases for this:
-  1) There should always be a way for the user to add parens
-     when they'd like. This is accomplished through r:seq
-     always adding parens.
+Considerations / subtle cases for this:
+1) There should always be a way for the user to add parens
+when they'd like. This is accomplished through r:seq
+always adding parens.
 
-  2) Quoted things (made by r:quote) don't need to be parenthesized
-     at first; not until and unless we're doing something with them later
-     (see below, (3)).
+2) Quoted things (made by r:quote) don't need to be parenthesized
+at first; not until and unless we're doing something with them later
+(see below, (3)).
 
-  3) r:repeat (as well as r:+ and r:*) don't need to add parens
-     around that thing which they are repeating if that thing
-     is either a single character, or already has parens or brackets
-     around it. Otherwise, they do need to add parens around it.
+3) r:repeat (as well as r:+ and r:*) don't need to add parens
+around that thing which they are repeating if that thing
+is either a single character, or already has parens or brackets
+around it. Otherwise, they do need to add parens around it.
 
 |#
 

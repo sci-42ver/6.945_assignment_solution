@@ -16,16 +16,16 @@
            1)))
 
 (define (get-predicate-property keylist)
-   (let ((predicate (get-keyword-value keylist 'predicate)))
-     (if (not (default-object? predicate))
-         predicate
-         any-object?)))
+  (let ((predicate (get-keyword-value keylist 'predicate)))
+    (if (not (default-object? predicate))
+      predicate
+      any-object?)))
 
 (define (get-default-supplier-property keylist)
   (let ((value (get-keyword-value keylist 'default-value))
         (supplier (get-keyword-value keylist 'default-supplier))
         (property
-         (get-keyword-value keylist 'default-to-property)))
+          (get-keyword-value keylist 'default-to-property)))
     (cond ((not (default-object? value))
            (lambda (lookup) value))
           ((not (default-object? supplier))
@@ -41,8 +41,8 @@
   `(predicate ,@property-default-keywords))
 
 (define-record-type <property>
-    (%make-property name predicate default-supplier)
-    property?
+  (%make-property name predicate default-supplier)
+  property?
   (name property-name)
   (predicate property-predicate)
   (default-supplier property-default-supplier))
@@ -51,8 +51,8 @@
   (if (property-default-supplier property) #t #f))
 
 (define-record-printer <property>
-  (lambda (property)
-    (list (property-name property))))
+                       (lambda (property)
+                         (list (property-name property))))
 
 ;;;; Types
 
@@ -86,7 +86,7 @@
         (properties (type-properties type)))
     (lambda keylist
       (let ((object
-             (constructor (parse-keylist keylist properties))))
+              (constructor (parse-keylist keylist properties))))
         (set-up! object)
         object))))
 
@@ -94,34 +94,34 @@
 (define (parse-keylist keylist properties)
   (define (lookup-value property)
     (let ((value
-           (get-keyword-value keylist
-                              (property-name property))))
+            (get-keyword-value keylist
+                               (property-name property))))
       (if (default-object? value)
-          (begin
-            (if (not (property-optional? property))
-                (error "Missing required property:"
-                       (property-name property)
-                       keylist))
-            ((property-default-supplier property) lookup-value))
-          value)))
+        (begin
+          (if (not (property-optional? property))
+            (error "Missing required property:"
+                   (property-name property)
+                   keylist))
+          ((property-default-supplier property) lookup-value))
+        value)))
   (make-instance-data
-   (map (lambda (property)
-          (cons property (lookup-value property)))
-        properties)))
+    (map (lambda (property)
+           (cons property (lookup-value property)))
+         properties)))
 
 (define set-up!
   (chaining-generic-procedure 'set-up! 1))
 
 (define-generic-procedure-default-handler set-up!
-  (lambda (object)
-    #f))
+                                          (lambda (object)
+                                            #f))
 
 (define tear-down!
   (chaining-generic-procedure 'tear-down! 1))
 
 (define-generic-procedure-default-handler tear-down!
-  (lambda (object)
-    #f))
+                                          (lambda (object)
+                                            #f))
 
 ;;;; Instance data
 
@@ -130,19 +130,19 @@
 
 (define make-instance-data
   (let ((constructor
-         (predicate-constructor instance-data?)))
+          (predicate-constructor instance-data?)))
     (lambda (bindings)
       (constructor
-       (lambda (#!optional property)
-         (if (default-object? property)
-             (map car bindings)
-             (let ((p (assv property bindings)))
-               (if (not p)
-                   (error "Unknown property:" property))
-               (lambda (#!optional new-value)
-                 (if (default-object? new-value)
-                     (cdr p)
-                     (set-cdr! p new-value))))))))))
+        (lambda (#!optional property)
+          (if (default-object? property)
+            (map car bindings)
+            (let ((p (assv property bindings)))
+              (if (not p)
+                (error "Unknown property:" property))
+              (lambda (#!optional new-value)
+                (if (default-object? new-value)
+                  (cdr p)
+                  (set-cdr! p new-value))))))))))
 
 (define instance-data-bindings
   (predicate-accessor instance-data?))
@@ -157,53 +157,53 @@
 
 (define (property-getter property type)
   (let ((procedure
-         (std-generic-procedure
-          (symbol 'get- (property-name property))
-          1)))
+          (std-generic-procedure
+            (symbol 'get- (property-name property))
+            1)))
     (define-generic-procedure-handler procedure
-      (match-args type)
-      (lambda (object)
-        ((get-binding property object))))
+                                      (match-args type)
+                                      (lambda (object)
+                                        ((get-binding property object))))
     procedure))
 
 (define (property-setter property type value-predicate)
   (let ((procedure
-         (std-generic-procedure
-          (symbol 'set- (property-name property) '!)
-          2)))
+          (std-generic-procedure
+            (symbol 'set- (property-name property) '!)
+            2)))
     (define-generic-procedure-handler procedure
-      (match-args type value-predicate)
-      (lambda (object value)
-        (let ((binding (get-binding property object)))
-          (%binding-set-prefix property value (binding) object)
-          (binding value))))
+                                      (match-args type value-predicate)
+                                      (lambda (object value)
+                                        (let ((binding (get-binding property object)))
+                                          (%binding-set-prefix property value (binding) object)
+                                          (binding value))))
     procedure))
 
 (define (%binding-set-prefix property new-value old-value object)
   (if debug-output
-      (begin
-        (send-message! (list ";setting" (possessive object)
-                             (property-name property)
-                             "to" new-value)
-                       debug-output)
-        (send-message! (list ";previous value was" old-value)
-                       debug-output))))
+    (begin
+      (send-message! (list ";setting" (possessive object)
+                           (property-name property)
+                           "to" new-value)
+                     debug-output)
+      (send-message! (list ";previous value was" old-value)
+                     debug-output))))
 
 (define (property-modifier property type value-predicate
                            noun modifier)
   (let ((procedure
-         (std-generic-procedure
-          (symbol (property-name property) '- noun)
-          2)))
+          (std-generic-procedure
+            (symbol (property-name property) '- noun)
+            2)))
     (define-generic-procedure-handler procedure
-      (match-args type value-predicate)
-      (lambda (object item)
-        (let* ((binding (get-binding property object))
-               (old-value (binding))
-               (new-value (modifier item old-value)))
-          (%binding-set-prefix property new-value old-value
-                               object)
-          (binding new-value))))
+                                      (match-args type value-predicate)
+                                      (lambda (object item)
+                                        (let* ((binding (get-binding property object))
+                                               (old-value (binding))
+                                               (new-value (modifier item old-value)))
+                                          (%binding-set-prefix property new-value old-value
+                                                               object)
+                                          (binding new-value))))
     procedure))
 
 (define (property-adder property type value-predicate)
@@ -273,20 +273,20 @@
         objects))
 
 (define-generic-procedure-handler tagged-data-representation
-  (match-args object?)
-  (lambda (super object)
-    (append (super object)
-            (list (get-name object)))))
+                                  (match-args object?)
+                                  (lambda (super object)
+                                    (append (super object)
+                                            (list (get-name object)))))
 
 (define-generic-procedure-handler tagged-data-description
-  (match-args object?)
-  (lambda (object)
-    (let ((instance-data (tagged-data-data object)))
-      (map (lambda (property)
-             (list (property-name property)
-                   ((instance-data-binding property
-                                           instance-data))))
-           (instance-data-properties instance-data)))))
+                                  (match-args object?)
+                                  (lambda (object)
+                                    (let ((instance-data (tagged-data-data object)))
+                                      (map (lambda (property)
+                                             (list (property-name property)
+                                                   ((instance-data-binding property
+                                                                           instance-data))))
+                                           (instance-data-properties instance-data)))))
 
 ;;; Messaging
 
@@ -296,15 +296,15 @@
 (define (narrate! message person-or-place)
   (send-message! message
                  (if (person? person-or-place)
-                     (get-location person-or-place)
-                     person-or-place))
+                   (get-location person-or-place)
+                   person-or-place))
   (if debug-output
-      (send-message! message debug-output)))
+    (send-message! message debug-output)))
 
 (define (tell! message person)
   (send-message! message person)
   (if debug-output
-      (send-message! message debug-output)))
+    (send-message! message debug-output)))
 
 (define (say! person message)
   (narrate! (append (list person "says:") message)
@@ -315,30 +315,30 @@
               (send-message! message place))
             (get-all-places))
   (if debug-output
-      (send-message! message debug-output)))
+    (send-message! message debug-output)))
 
 (define debug-output #f)
 
 (define (enable-debugging)
   (if (not debug-output)
-      (set! debug-output (make-screen 'name 'debug)))
+    (set! debug-output (make-screen 'name 'debug)))
   unspecific)
 
 (define (disable-debugging)
   (if debug-output
-      (set! debug-output #f))
+    (set! debug-output #f))
   unspecific)
 
 (define (display-message message port)
   (guarantee message? message 'display-message)
   (if (pair? message)
-      (begin
-        (fresh-line port)
-        (display-item (car message) port)
-        (for-each (lambda (item)
-                    (display " " port)
-                    (display-item item port))
-                  (cdr message)))))
+    (begin
+      (fresh-line port)
+      (display-item (car message) port)
+      (for-each (lambda (item)
+                  (display " " port)
+                  (display-item item port))
+                (cdr message)))))
 
 (define (display-item item port)
   (display (if (object? item) (get-name item) item) port))
@@ -369,9 +369,9 @@
   (property-getter screen:port screen?))
 
 (define-generic-procedure-handler send-message!
-  (match-args message? screen?)
-  (lambda (message screen)
-    (display-message message (get-port screen))))
+                                  (match-args message? screen?)
+                                  (lambda (message screen)
+                                    (display-message message (get-port screen))))
 
 ;;; Clock
 
@@ -379,8 +379,8 @@
   (%make-clock 0 '()))
 
 (define-record-type <clock>
-    (%make-clock current-time things)
-    clock?
+  (%make-clock current-time things)
+  clock?
   (current-time current-time set-current-time!)
   (things clock-things set-clock-things!))
 
@@ -403,12 +403,12 @@
   (chaining-generic-procedure 'clock-tick! 1))
 
 (define-generic-procedure-default-handler clock-tick!
-  (lambda (thing)
-    #f))
+                                          (lambda (thing)
+                                            #f))
 
 (define (define-clock-handler type-predicate action)
   (define-generic-procedure-handler clock-tick!
-    (match-args type-predicate)
-    (lambda (super object)
-      (super object)
-      (action object))))
+                                    (match-args type-predicate)
+                                    (lambda (super object)
+                                      (super object)
+                                      (action object))))

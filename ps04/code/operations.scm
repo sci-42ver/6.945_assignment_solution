@@ -36,9 +36,9 @@
                      'installable-operation-procedure)
 
 (define-generic-procedure-handler value-restriction
-  (match-args installable-operation-procedure? predicate?)
-  (lambda (value predicate)
-    (value-fit (applicable-object->object value) predicate)))
+                                  (match-args installable-operation-procedure? predicate?)
+                                  (lambda (value predicate)
+                                    (value-fit (applicable-object->object value) predicate)))
 
 ;;; API
 (define (operation-components operation)
@@ -60,8 +60,8 @@
 (define (simple-operation operator predicate procedure)
   (make-simple-function operator
                         (call-with-values
-                            (lambda ()
-                              (operator-signature operator predicate))
+                          (lambda ()
+                            (operator-signature operator predicate))
                           make-function-predicate)
                         procedure))
 

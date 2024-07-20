@@ -75,9 +75,9 @@
 
 (define *machine-epsilon*
   (let loop ((e 1.0))
-     (if (= 1.0 (+ e 1.0))
-         (* 2.0 e)
-         (loop (/ e 2.0)))))
+    (if (= 1.0 (+ e 1.0))
+      (* 2.0 e)
+      (loop (/ e 2.0)))))
 
 (define (sign x)
   (cond ((positive? x) 1)
@@ -101,13 +101,13 @@
   (guarantee n:list? items)
   (let loop ((items items))
     (if (n:pair? items)
-        (append-map (lambda (index)
-                      (map (let ((head (list-ref items index)))
-                             (lambda (tail)
-                               (cons head tail)))
-                           (loop (delete-item items index))))
-                    (iota (length items)))
-        '(()))))
+      (append-map (lambda (index)
+                    (map (let ((head (list-ref items index)))
+                           (lambda (tail)
+                             (cons head tail)))
+                         (loop (delete-item items index))))
+                  (iota (length items)))
+      '(()))))
 
 (define (delete-item items index)
   (append (take items index)
@@ -117,28 +117,28 @@
   (guarantee-list-of n:non-empty-list? lists)
   (let loop ((lists lists))
     (if (n:pair? lists)
-        (append-map (let ((tails (loop (cdr lists))))
-                      (lambda (head)
-                        (map (lambda (tail)
-                               (cons head tail))
-                             tails)))
-                    (car lists))
-        '(()))))
+      (append-map (let ((tails (loop (cdr lists))))
+                    (lambda (head)
+                      (map (lambda (tail)
+                             (cons head tail))
+                           tails)))
+                  (car lists))
+      '(()))))
 
 (define (partition-by-key = get-key objects)
   (let ((partitions '()))
     (for-each (lambda (object)
                 (let ((key (get-key object)))
                   (let ((partition
-                         (find (lambda (partition)
-                                 (= (car partition) key))
-                               partitions)))
+                          (find (lambda (partition)
+                                  (= (car partition) key))
+                                partitions)))
                     (if partition
-                        (set-cdr! partition
-                                  (cons object (cdr partition)))
-                        (set! partitions
-                              (cons (list key object)
-                                    partitions))))))
+                      (set-cdr! partition
+                                (cons object (cdr partition)))
+                      (set! partitions
+                        (cons (list key object)
+                              partitions))))))
               objects)
     partitions))
 
@@ -146,19 +146,19 @@
 
 (define (implementation-type-name object)
   (let ((names
-         (microcode-type/code->names (object-type object))))
+          (microcode-type/code->names (object-type object))))
     (if (n:pair? names)
-        (car names)
-        'object)))
+      (car names)
+      'object)))
 
 (define (implementation-type-predicate name)
   (or (hash-table-ref/default %implementation-type-predicates
                               name
                               #f)
       (let ((predicate
-             (let ((code (microcode-type name)))
-               (lambda (object)
-                 (object-type? code object)))))
+              (let ((code (microcode-type name)))
+                (lambda (object)
+                  (object-type? code object)))))
         (hash-table-set! %implementation-type-predicates
                          name
                          predicate)
@@ -179,8 +179,8 @@
 
 (define (hash-by-eqv object #!optional modulus)
   (if (default-object? modulus)
-      (eqv-hash object)
-      (eqv-hash-mod object modulus)))
+    (eqv-hash object)
+    (eqv-hash-mod object modulus)))
 
 (define (save-environment! name environment)
   ;; A hook to use if we want to keep track of
@@ -203,18 +203,18 @@
                       #t
                       (lambda () (apply load args)))))
         (else
-         ;; Older shallow fluid bindings:
-         (lambda args
-           (fluid-let ((load/suppress-loading-message? #t))
-             (apply load args))))))
+          ;; Older shallow fluid bindings:
+          (lambda args
+            (fluid-let ((load/suppress-loading-message? #t))
+                       (apply load args))))))
 
 (define (define-record-printer record-type get-parts)
   (set-record-type-unparser-method!
-   record-type
-   (simple-unparser-method
-    (let ((name (record-type-name record-type)))
-      (if (and (string-prefix? "<" name)
-               (string-suffix? ">" name))
+    record-type
+    (simple-unparser-method
+      (let ((name (record-type-name record-type)))
+        (if (and (string-prefix? "<" name)
+                 (string-suffix? ">" name))
           (substring name 1 (fix:- (string-length name) 1))
           name))
-    get-parts)))
+      get-parts)))

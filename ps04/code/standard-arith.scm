@@ -16,111 +16,111 @@
 
 (define (symbolic-constructor base-predicate)
   (predicate-constructor
-   (make-symbolic-predicate base-predicate)))
+    (make-symbolic-predicate base-predicate)))
 
 (define (make-symbolic-arithmetic base-arithmetic)
   (let* ((base-domain
-          (arithmetic-domain-predicate base-arithmetic))
+           (arithmetic-domain-predicate base-arithmetic))
          (domain
-          (extend-predicate make-symbolic-predicate base-domain)))
+           (extend-predicate make-symbolic-predicate base-domain)))
     (make-arithmetic 'symbolic
                      domain
                      (list base-arithmetic)
-      (lambda (name base-constant)
-        base-constant)
-      (lambda (operator base-operation)
-        (extend-operation-function operator base-operation
-          (lambda (base-operation)
-            (let ((codomain
-                   (extend-operation-codomain
-                      make-symbolic-predicate
-                      base-operation)))
-              (make-simple-operation
-               operator
-               (extend-operation-domains make-symbolic-predicate
-                                         base-operation)
-               codomain
-               (let ((arg-preds
-                      (map make-symbolic-predicate
-                           (operation-domains base-operation)))
-                     (tagger (predicate-constructor codomain)))
-                 (lambda args
-                   (if (any (lambda (arg-pred arg)
-                              (arg-pred arg))
-                            arg-preds
-                            args)
-                       (tagger (cons operator args))
-                       (apply base-operation args))))))))))))
+                     (lambda (name base-constant)
+                       base-constant)
+                     (lambda (operator base-operation)
+                       (extend-operation-function operator base-operation
+                                                  (lambda (base-operation)
+                                                    (let ((codomain
+                                                            (extend-operation-codomain
+                                                              make-symbolic-predicate
+                                                              base-operation)))
+                                                      (make-simple-operation
+                                                        operator
+                                                        (extend-operation-domains make-symbolic-predicate
+                                                                                  base-operation)
+                                                        codomain
+                                                        (let ((arg-preds
+                                                                (map make-symbolic-predicate
+                                                                     (operation-domains base-operation)))
+                                                              (tagger (predicate-constructor codomain)))
+                                                          (lambda args
+                                                            (if (any (lambda (arg-pred arg)
+                                                                       (arg-pred arg))
+                                                                     arg-preds
+                                                                     args)
+                                                              (tagger (cons operator args))
+                                                              (apply base-operation args))))))))))))
 
 ;;;; Function arithmetic
 
 (define (make-endo-function-arithmetic base-arithmetic)
   (make-function-arithmetic
-   (list (arithmetic-domain-predicate base-arithmetic))
-   base-arithmetic))
+    (list (arithmetic-domain-predicate base-arithmetic))
+    base-arithmetic))
 
 (define (make-function-arithmetic domains base-arithmetic)
   (let* ((make-function-signature
-          (lambda (codomain)
-            (make-function-predicate domains codomain)))
+           (lambda (codomain)
+             (make-function-predicate domains codomain)))
          (make-function
-          (lambda (name codomain procedure)
-            (make-simple-function
+           (lambda (name codomain procedure)
+             (make-simple-function
                name
                (make-function-signature codomain)
                procedure)))
          (base-predicate
-          (arithmetic-domain-predicate base-arithmetic))
+           (arithmetic-domain-predicate base-arithmetic))
          (pure-function-predicate
-          (make-function-signature base-predicate)))
+           (make-function-signature base-predicate)))
     (make-arithmetic 'function
                      (extend-predicate make-function-signature
                                        base-predicate)
                      (list base-arithmetic)
-      (lambda (name base-constant)
-        base-constant)
-      (lambda (operator base-operation)
-        (extend-operation-function operator base-operation
-          (lambda (base-operation)
-            (make-simple-operation
-               operator
-               (extend-operation-domains make-function-signature
-                                         base-operation)
-               (extend-operation-codomain make-function-signature
-                                          base-operation)
-               (lambda operation-args
-                 (make-function
-                    operator
-                    (operation-codomain base-operation)
-                    (lambda args
-                      (apply base-operation
-                             (map (lambda (operation-arg)
-                                    (if (pure-function-predicate
-                                           operation-arg)
-                                        (apply-function
-                                           operation-arg
-                                           args)
-                                        operation-arg))
-                                  operation-args))))))))))))
+                     (lambda (name base-constant)
+                       base-constant)
+                     (lambda (operator base-operation)
+                       (extend-operation-function operator base-operation
+                                                  (lambda (base-operation)
+                                                    (make-simple-operation
+                                                      operator
+                                                      (extend-operation-domains make-function-signature
+                                                                                base-operation)
+                                                      (extend-operation-codomain make-function-signature
+                                                                                 base-operation)
+                                                      (lambda operation-args
+                                                        (make-function
+                                                          operator
+                                                          (operation-codomain base-operation)
+                                                          (lambda args
+                                                            (apply base-operation
+                                                                   (map (lambda (operation-arg)
+                                                                          (if (pure-function-predicate
+                                                                                operation-arg)
+                                                                            (apply-function
+                                                                              operation-arg
+                                                                              args)
+                                                                            operation-arg))
+                                                                        operation-args))))))))))))
 
 (define (get-object-name object)
   (if (function? object)
-      (function-name object)
-      (strip-tags object)))
+    (function-name object)
+    (strip-tags object)))
 
 (define (expand-disjunct-predicates predicates)
   (let loop ((predicates predicates))
     (if (pair? predicates)
-        (append-map (lambda (tail)
-                      (map (lambda (head)
-                             (cons head tail))
-                           (expand-disjunct-predicate
-                            (car predicates))))
-                    (loop (cdr predicates)))
-        (list '()))))
+      (append-map (lambda (tail)
+                    (map (lambda (head)
+                           (cons head tail))
+                         (expand-disjunct-predicate
+                           (car predicates))))
+                  (loop (cdr predicates)))
+      (list '()))))
 
 (define (expand-disjunct-predicate predicate)
   (if (disjunction? predicate)
-      (append-map expand-disjunct-predicate
-                  (compound-predicate-components predicate))
-      (list predicate)))
+    (append-map expand-disjunct-predicate
+                (compound-predicate-components predicate))
+    (list predicate)))

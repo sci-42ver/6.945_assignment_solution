@@ -10,7 +10,7 @@
 
 (define (guarantee predicate object #!optional caller)
   (if (not (predicate object))
-      (error:not-a predicate object caller))
+    (error:not-a predicate object caller))
   object)
 
 (define (error:not-a predicate object #!optional caller)
@@ -20,21 +20,21 @@
 
 (define (guarantee-list-of predicate object #!optional caller)
   (if (not (list-of-type? object predicate))
-      (error:not-a-list-of predicate object caller))
+    (error:not-a-list-of predicate object caller))
   object)
 
 (define (error:not-a-list-of predicate object #!optional caller)
   (error:wrong-type-argument object
                              (string-append
-                              "list of "
-                              (predicate-description predicate))
+                               "list of "
+                               (predicate-description predicate))
                              caller))
 
 (define (predicate-description predicate)
   (if (predicate? predicate)
-      (object->description (predicate-name predicate))
-      (string-append "object satisfying "
-                     (object->description predicate))))
+    (object->description (predicate-name predicate))
+    (string-append "object satisfying "
+                   (object->description predicate))))
 
 (define (object->description object)
   (call-with-output-string
@@ -62,12 +62,12 @@
   (guarantee predicate? car-predicate)
   (guarantee predicate? cdr-predicate)
   (register-compound-predicate!
-   (lambda (object)
-     (and (n:pair? object)
-          (car-predicate (car object))
-          (cdr-predicate (cdr object))))
-   'is-pair-of
-   (list car-predicate cdr-predicate)))
+    (lambda (object)
+      (and (n:pair? object)
+           (car-predicate (car object))
+           (cdr-predicate (cdr object))))
+    'is-pair-of
+    (list car-predicate cdr-predicate)))
 
 (define (disjoin . predicates)
   (disjoin* predicates))
@@ -96,8 +96,8 @@
 (define (equality-predicate-maker name =)
   (lambda (object)
     (let ((predicate
-           (lambda (object*)
-             (= object object*))))
+            (lambda (object*)
+              (= object object*))))
       (register-predicate! predicate (list name =))
       predicate)))
 

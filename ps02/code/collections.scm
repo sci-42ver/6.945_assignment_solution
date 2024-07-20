@@ -11,9 +11,9 @@
 
     (define (add-element! element)
       (if (not (weak-memq element elements))
-          (begin
-            (set! elements (weak-cons element elements))
-            unspecific)))
+        (begin
+          (set! elements (weak-cons element elements))
+          unspecific)))
 
     (lambda (operator)
       (case operator
@@ -35,11 +35,11 @@
 
     (define (get key)
       (let ((p
-             (find (lambda (p)
-                     (key=? (car p) key))
-                   alist)))
+              (find (lambda (p)
+                      (key=? (car p) key))
+                    alist)))
         (if (not p)
-            (error "Unknown key:" key))
+          (error "Unknown key:" key))
         (cdr p)))
 
     (define (get-matching predicate)
@@ -50,10 +50,10 @@
 
     (define (put! key datum)
       (set! alist
-            (cons (cons key datum)
-                  (remove! (lambda (p)
-                             (key=? (car p) key))
-                           alist)))
+        (cons (cons key datum)
+              (remove! (lambda (p)
+                         (key=? (car p) key))
+                       alist)))
       key)
 
     (lambda (operator)
@@ -90,17 +90,17 @@
 
 (define (make-metadata-association)
   (let* ((store
-          (make-hash-table-store make-key-weak-eqv-hash-table))
+           (make-hash-table-store make-key-weak-eqv-hash-table))
          (base-has? (store 'has?))
          (base-get (store 'get))
          (base-put! (store 'put!)))
 
     (define (put! key metadata)
       (if (base-has? key)
-          (let ((metadata* (base-get key)))
-            (if (not (eqv? metadata* metadata))
-                (error "Can't change metadata for:"
-                       key metadata metadata*))))
+        (let ((metadata* (base-get key)))
+          (if (not (eqv? metadata* metadata))
+            (error "Can't change metadata for:"
+                   key metadata metadata*))))
       (base-put! key metadata))
 
     (lambda (operator)

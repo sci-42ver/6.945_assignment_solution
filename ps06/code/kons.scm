@@ -5,8 +5,8 @@
        (eq? (car exp) 'kons)))
 
 (defhandler eval
-  (lambda (expression environment)
-    (cons (delay-memo (cadr expression) environment)
-	  (delay-memo (caddr expression) environment)))
-  kons?)
+            (lambda (expression environment)
+              (cons (delay-memo (cadr expression) environment)
+                    (delay-memo (caddr expression) environment)))
+            kons?)
 

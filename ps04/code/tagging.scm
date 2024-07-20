@@ -4,8 +4,8 @@
   (simple-generic-procedure 'get-tag 1))
 
 (define-generic-procedure-default-handler get-tag
-  (lambda (object)
-    (implementation-tag object)))
+                                          (lambda (object)
+                                            (implementation-tag object)))
 
 (define (get-predicate object)
   (tag->predicate (get-tag object)))
@@ -14,32 +14,32 @@
   (simple-generic-procedure 'get-data 1))
 
 (define-generic-procedure-default-handler get-data
-  (lambda (object)
-    object))
+                                          (lambda (object)
+                                            object))
 
 ;;;; Tagged data
 
 (define-record-type <tagged-data>
-    (%make-tagged-data tag data)
-    tagged-data?
+  (%make-tagged-data tag data)
+  tagged-data?
   (tag tagged-data-tag)
   (data tagged-data-data))
 
 (define-generic-procedure-handler get-tag
-  (match-args tagged-data?)
-  tagged-data-tag)
+                                  (match-args tagged-data?)
+                                  tagged-data-tag)
 
 (define-generic-procedure-handler get-data
-  (match-args tagged-data?)
-  tagged-data-data)
+                                  (match-args tagged-data?)
+                                  tagged-data-data)
 
 (define (tagged-data= t1 t2)
   (and (eq? (tagged-data-tag t1) (tagged-data-tag t2))
        (equal*? (tagged-data-data t1) (tagged-data-data t2))))
 
 (define-generic-procedure-handler equal*?
-  (match-args tagged-data? tagged-data?)
-  tagged-data=)
+                                  (match-args tagged-data? tagged-data?)
+                                  tagged-data=)
 
 (define tagged-data-representation
   (make-generic-procedure 'tagged-data-representation 1
@@ -52,24 +52,24 @@
 
 ;;; MIT/GNU Scheme: integrate with printer
 (set-record-type-unparser-method! <tagged-data>
-  (let ((hash (access hash system-global-environment)))
-    (lambda (state tagged-data)
-      (with-current-unparser-state state
-        (lambda (port)
-          (display "#[" port)
-          (display (tag-name (tagged-data-tag tagged-data)) port)
-          (display " " port)
-          (write (hash tagged-data) port)
-          (for-each (lambda (object)
-                      (display " " port)
-                      (write object port))
-                    (tagged-data-representation tagged-data))
-          (display "]" port))))))
+                                  (let ((hash (access hash system-global-environment)))
+                                    (lambda (state tagged-data)
+                                      (with-current-unparser-state state
+                                                                   (lambda (port)
+                                                                     (display "#[" port)
+                                                                     (display (tag-name (tagged-data-tag tagged-data)) port)
+                                                                     (display " " port)
+                                                                     (write (hash tagged-data) port)
+                                                                     (for-each (lambda (object)
+                                                                                 (display " " port)
+                                                                                 (write object port))
+                                                                               (tagged-data-representation tagged-data))
+                                                                     (display "]" port))))))
 
 (define tagged-data-description
   (make-generic-procedure
-   'tagged-data-description 1
-   cached-most-specific-generic-dispatcher))
+    'tagged-data-description 1
+    cached-most-specific-generic-dispatcher))
 
 (define-generic-procedure-default-handler
   tagged-data-description
@@ -77,11 +77,11 @@
 
 ;;; MIT/GNU Scheme: integrate with pretty-printer
 (add-generic-procedure-generator pp-description
-  (let ((tag (record-type-dispatch-tag <tagged-data>)))
-    (lambda (generic tags)
-      generic
-      (and (eq? (car tags) tag)
-           tagged-data-description))))
+                                 (let ((tag (record-type-dispatch-tag <tagged-data>)))
+                                   (lambda (generic tags)
+                                     generic
+                                     (and (eq? (car tags) tag)
+                                          tagged-data-description))))
 
 ;;;; Tagging strategies
 
@@ -89,8 +89,8 @@
 
   (define (constructor data)
     (if (not (data-test data))
-        (error (string "Ill-formed data for " name ":")
-               data))
+      (error (string "Ill-formed data for " name ":")
+             data))
     data)
 
   (define tag
@@ -102,8 +102,8 @@
 
   (define (constructor data)
     (if (not (data-test data))
-        (error (string "Ill-formed data for " name ":")
-               data))
+      (error (string "Ill-formed data for " name ":")
+             data))
     (%make-tagged-data tag data))
 
   (define (predicate object)
@@ -120,11 +120,11 @@
 
   (define (constructor data)
     (if (not (data-test data))
-        (error (string "Ill-formed data for " name ":")
-               data))
+      (error (string "Ill-formed data for " name ":")
+             data))
     (if (eq? tag (get-tag data))
-        data
-        (%make-tagged-data tag data)))
+      data
+      (%make-tagged-data tag data)))
 
   (define (predicate object)
     (or (and (tagged-data? object)
@@ -134,8 +134,8 @@
 
   (define (accessor object)
     (if (tagged-data? object)
-        (tagged-data-data object)
-        object))
+      (tagged-data-data object)
+      object))
 
   (define tag
     (make-tag predicate constructor accessor))

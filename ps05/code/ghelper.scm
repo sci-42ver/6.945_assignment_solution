@@ -56,14 +56,14 @@
 |#
 
 (define (make-generic-operator arity
-                   #!optional name default-operation)
+                               #!optional name default-operation)
   (let ((record (make-operator-record arity)))
 
     (define (operator . arguments)
       (if (not (acceptable-arglist? arguments arity))
-          (error:wrong-number-of-arguments
-           (if (default-object? name) operator name)
-           arity arguments))
+        (error:wrong-number-of-arguments
+          (if (default-object? name) operator name)
+          arity arguments))
       (apply (find-handler (operator-record-tree record)
                            arguments)
              arguments))
@@ -72,13 +72,13 @@
 
     (set! default-operation
       (if (default-object? default-operation)
-          (named-lambda (no-handler . arguments)
-            (error "Generic operator inapplicable:"
-                   (if (default-object? name) operator name)
-                   arguments))
-          default-operation))
+        (named-lambda (no-handler . arguments)
+                      (error "Generic operator inapplicable:"
+                             (if (default-object? name) operator name)
+                             arguments))
+        default-operation))
     (if (not (default-object? name))    ; Operation by name
-        (set-operator-record! name record))
+      (set-operator-record! name record))
 
     (assign-operation operator default-operation)
     operator))
@@ -101,9 +101,9 @@
 
 (pp (get-operator-record blend))
 (2 (green? (green? . g+g) (blue? . g+b))
-   (blue? (green? . b+g) (blue? . b+b))
-   .
-   blend-default)
+ (blue? (green? . b+g) (blue? . b+b))
+ .
+ blend-default)
 |#
 
 #|
@@ -117,10 +117,10 @@
 
 (pp (get-operator-record blend))
 (2 (bleen? (grue? . e+u) (red? . e+r))
-   (green? (green? . g+g) (blue? . g+b))
-   (blue? (green? . b+g) (blue? . b+b))
-   .
-   blend-default)
+ (green? (green? . g+g) (blue? . g+b))
+ (blue? (green? . b+g) (blue? . b+b))
+ .
+ blend-default)
 
 ;;; Consider what happens if we invoke
 ;;; (blend <bleen> <blue>)
@@ -130,12 +130,12 @@
 
 (define (find-handler tree args)
   (if (null? args)
-      tree
-      (find-branch tree
-		   (car args)
-		   (lambda (result)
-		     (find-handler result
-				   (cdr args))))))
+    tree
+    (find-branch tree
+                 (car args)
+                 (lambda (result)
+                   (find-handler result
+                                 (cdr args))))))
 
 (define (find-branch tree arg next)
   (let loop ((tree tree))
@@ -151,18 +151,18 @@
   (let ((record (get-operator-record operator))
         (arity (length argument-predicates)))
     (if record
-        (begin
-          (if (not (<= arity
-                       (procedure-arity-min
-                        (operator-record-arity record))))
-              (error "Incorrect operator arity:" operator))
-          (bind-in-tree argument-predicates
-                        handler
-                        (operator-record-tree record)
-                        (lambda (new)
-                          (set-operator-record-tree! record
-                                                     new))))
-        (error "Undefined generic operator" operator)))
+      (begin
+        (if (not (<= arity
+                     (procedure-arity-min
+                       (operator-record-arity record))))
+          (error "Incorrect operator arity:" operator))
+        (bind-in-tree argument-predicates
+                      handler
+                      (operator-record-tree record)
+                      (lambda (new)
+                        (set-operator-record-tree! record
+                                                   new))))
+      (error "Undefined generic operator" operator)))
   operator)
 
 (define defhandler assign-operation)
@@ -170,45 +170,45 @@
 (define (bind-in-tree keys handler tree replace!)
   (let loop ((keys keys) (tree tree) (replace! replace!))
     (cond ((pair? keys)   ; more argument-predicates
-	   (let find-key ((tree* tree)) 
-	     (if (pair? tree*)
-		 (if (eq? (caar tree*) (car keys))
-		     ;; There is already some discrimination
-		     ;; list keyed by this predicate: adjust it
-		     ;; according to the remaining keys
-		     (loop (cdr keys)
-			   (cdar tree*)
-			   (lambda (new)
-			     (set-cdr! (car tree*) new)))
-		     (find-key (cdr tree*)))
-		 (let ((better-tree
-			(cons (cons (car keys) '()) tree)))
-		   ;; There was no entry for the key I was
-		   ;; looking for.  Create it at the head of
-		   ;; the alist and try again.
-		   (replace! better-tree)
-		   (loop keys better-tree replace!)))))
-	  ;; cond continues on next page.
-
-	  ((pair? tree)  ; no more argument predicates.
-            ;; There is more discrimination list here,
-            ;; because my predicate list is a proper prefix
-            ;; of the predicate list of some previous
-            ;; assign-operation.  Insert the handler at the
-            ;; end, causing it to implicitly accept any
-            ;; arguments that fail all available tests.
-	   (let ((p (last-pair tree)))
-	     (if (not (null? (cdr p)))
-		 (warn "Replacing a default handler:"
-		       (cdr p) handler))
-	     (set-cdr! p handler)))
-	  (else
-	   ;; There is no discrimination list here.  This
-	   ;; handler becomes the discrimination list,
-	   ;; accepting further arguments if any.
-	   (if (not (null? tree))
-	       (warn "Replacing a handler:" tree handler))
-	   (replace! handler)))))
+           (let find-key ((tree* tree)) 
+             (if (pair? tree*)
+               (if (eq? (caar tree*) (car keys))
+                 ;; There is already some discrimination
+                 ;; list keyed by this predicate: adjust it
+                 ;; according to the remaining keys
+                 (loop (cdr keys)
+                       (cdar tree*)
+                       (lambda (new)
+                         (set-cdr! (car tree*) new)))
+                 (find-key (cdr tree*)))
+               (let ((better-tree
+                       (cons (cons (car keys) '()) tree)))
+                 ;; There was no entry for the key I was
+                 ;; looking for.  Create it at the head of
+                 ;; the alist and try again.
+                 (replace! better-tree)
+                 (loop keys better-tree replace!)))))
+          ;; cond continues on next page.
+          
+          ((pair? tree)  ; no more argument predicates.
+           ;; There is more discrimination list here,
+           ;; because my predicate list is a proper prefix
+           ;; of the predicate list of some previous
+           ;; assign-operation.  Insert the handler at the
+           ;; end, causing it to implicitly accept any
+           ;; arguments that fail all available tests.
+           (let ((p (last-pair tree)))
+             (if (not (null? (cdr p)))
+               (warn "Replacing a default handler:"
+                     (cdr p) handler))
+             (set-cdr! p handler)))
+          (else
+            ;; There is no discrimination list here.  This
+            ;; handler becomes the discrimination list,
+            ;; accepting further arguments if any.
+            (if (not (null? tree))
+              (warn "Replacing a handler:" tree handler))
+            (replace! handler)))))
 
 (define *generic-operator-table* (make-eq-hash-table))
 
@@ -251,23 +251,23 @@
 (defhandler foo 'two-arg-b-c 'b 'c)
 (pp (get-operator-record foo))
 (3 (b (c . two-arg-b-c))
-   (a (c . two-arg-a-c) (b . two-arg-a-b))
-   . foo-default)
+ (a (c . two-arg-a-c) (b . two-arg-a-b))
+ . foo-default)
 |#
 
 #|
 (defhandler foo 'one-arg-b 'b)
 (pp (get-operator-record foo))
 (3 (b (c . two-arg-b-c) . one-arg-b)
-   (a (c . two-arg-a-c) (b . two-arg-a-b))
-   . foo-default)
+ (a (c . two-arg-a-c) (b . two-arg-a-b))
+ . foo-default)
 
 (defhandler foo 'one-arg-a 'a)
 (pp (get-operator-record foo))
 (3 (b (c . two-arg-b-c) . one-arg-b)
-   (a (c . two-arg-a-c) (b . two-arg-a-b) . one-arg-a)
-   .
-   foo-default)
+ (a (c . two-arg-a-c) (b . two-arg-a-b) . one-arg-a)
+ .
+ foo-default)
 
 (defhandler foo 'one-arg-a-prime 'a)
 ;Warning: Replacing a default handler: 
@@ -280,13 +280,13 @@
 (defhandler foo 'three-arg-x-y-z 'x 'y 'z)
 (pp (get-operator-record foo))
 (3 (x (y (z . three-arg-x-y-z)))
-   (b (c . two-arg-b-c) . one-arg-b)
-   (a (c . two-arg-a-c)
-      (b . two-arg-a-b-prime)
-      . 
-      one-arg-a-prime)
-   .
-   foo-default)
+ (b (c . two-arg-b-c) . one-arg-b)
+ (a (c . two-arg-a-c)
+    (b . two-arg-a-b-prime)
+    . 
+    one-arg-a-prime)
+ .
+ foo-default)
 |#
 
 ;;; Compatibility with previous extensible generics
@@ -294,17 +294,17 @@
 (define make-generic-operation make-generic-operator)
 
 (define (add-to-generic-operation! operator
-				   applicability
-				   handler)
+                                   applicability
+                                   handler)
   ;; An applicability is a list representing a
   ;; disjunction of lists, each representing a
   ;; conjunction of predicates.
 
   (for-each (lambda (conj)
-	      (apply assign-operation
-		     operator
-		     handler
-		     conj))
-	    applicability))
+              (apply assign-operation
+                     operator
+                     handler
+                     conj))
+            applicability))
 
-				
+

@@ -15,14 +15,14 @@
     ((#\$) (list #\[ #\$ #\]))
     ((#\( #\) #\? #\+ #\{ #\})
      (if (eq? standard 'bre)
-	 char
-	 (list #\\ char)))
+       char
+       (list #\\ char)))
     (else (list char))))
 
 (define (r:quote standard string)
-   (list->string
-       (append-map (lambda (char)
-                     (quote-char standard char))
+  (list->string
+    (append-map (lambda (char)
+                  (quote-char standard char))
                 (string->list string))))
 
 (define (r:char-from standard string)
@@ -30,11 +30,11 @@
     ((0) (r:seq standard))
     ((1) (r:quote standard string))
     (else
-     (bracket string
-              (lambda (members)
-                (if (lset= eqv? '(#\- #\^) members)
-                    '(#\- #\^)
-                    (quote-bracketed-contents members)))))))
+      (bracket string
+               (lambda (members)
+                 (if (lset= eqv? '(#\- #\^) members)
+                   '(#\- #\^)
+                   (quote-bracketed-contents members)))))))
 
 (define (r:char-not-from standard string)
   (bracket string
@@ -43,17 +43,17 @@
 
 (define (bracket string procedure)
   (list->string
-   (append '(#\[)
-           (procedure (string->list string))
-           '(#\]))))
+    (append '(#\[)
+            (procedure (string->list string))
+            '(#\]))))
 
 (define (quote-bracketed-contents members)
   (let ((optional
-         (lambda (char) (if (memv char members) (list char) '()))))
+          (lambda (char) (if (memv char members) (list char) '()))))
     (append (optional #\])
             (remove (lambda (c)
-		      (memv c chars-needing-quoting-in-brackets))
-		    members)
+                      (memv c chars-needing-quoting-in-brackets))
+                    members)
             (optional #\^)
             (optional #\-))))
 
@@ -61,18 +61,18 @@
 ;;; Means of combination for patterns
 
 (define (make-special standard char)
-	(list->string
-		(case char
-		((#\( #\) #\{ #\} #\|) (case standard
-								('bre (list #\\ char))
-								('ere (list char))))
-		(else (list char)))))
+  (list->string
+    (case char
+      ((#\( #\) #\{ #\} #\|) (case standard
+                               ('bre (list #\\ char))
+                               ('ere (list char))))
+      (else (list char)))))
 
 (define (r:seq . (standard . exprs))
   (string-append 
-   (make-special standard #\()
-   (apply string-append exprs)
-   (make-special standard #\))))
+    (make-special standard #\()
+    (apply string-append exprs)
+    (make-special standard #\))))
 
 (define parenthesize r:seq)
 
@@ -80,51 +80,51 @@
 ;;; Supported by GNU grep and possibly others.
 (define (r:alt . (standard . exprs))
   (if (pair? exprs)
-      (apply r:seq
-             (cons (car exprs)
-                   (append-map (lambda (expr)
-                                 (list (make-special standard #\|)
-									   expr))
-                               (cdr exprs))))
-      (r:seq)))
+    (apply r:seq
+           (cons (car exprs)
+                 (append-map (lambda (expr)
+                               (list (make-special standard #\|)
+                                     expr))
+                             (cdr exprs))))
+    (r:seq)))
 
 (define (parenthesized? standard expr)
   (case standard
     ('ere
      (and (string=? "(" (string-head expr 1))
-	      (string=? ")" (string-tail expr (- (string-length expr) 1)))))
+          (string=? ")" (string-tail expr (- (string-length expr) 1)))))
     ('bre
      (and (string=? "\\(" (string-head expr 2))
-	      (string=? "\\)" (string-tail expr (- (string-length expr) 2)))))))
+          (string=? "\\)" (string-tail expr (- (string-length expr) 2)))))))
 
 (define (bracketed? standard expr)
-	(and (string=? "[" (string-head expr 1))
-	      (string=? "]" (string-tail expr (- (string-length expr) 1)))))
+  (and (string=? "[" (string-head expr 1))
+       (string=? "]" (string-tail expr (- (string-length expr) 1)))))
 
 (define (parenthesize-if-needed standard expr)
   (if (or
-       (= (string-length expr) 1)
-       (parenthesized? standard expr)
-       (bracketed? standard expr))
-      expr
-      (parenthesize standard expr)))
+        (= (string-length expr) 1)
+        (parenthesized? standard expr)
+        (bracketed? standard expr))
+    expr
+    (parenthesize standard expr)))
 
 (define (r:repeat standard min max expr)
-	(string-append
-	 (parenthesize-if-needed standard expr)
-	 (make-special standard #\{)
-	 (number->string min)
-	 ","
-	 (if max
-	     (number->string max)
-	     "")
-	 (make-special standard #\})))
+  (string-append
+    (parenthesize-if-needed standard expr)
+    (make-special standard #\{)
+    (number->string min)
+    ","
+    (if max
+      (number->string max)
+      "")
+    (make-special standard #\})))
 
 (define (r:* standard expr)
-   (r:repeat standard 0 #f expr))
+  (r:repeat standard 0 #f expr))
 
 (define (r:+ standard expr)
-   (r:repeat standard 1 #f expr))
+  (r:repeat standard 1 #f expr))
 
 (define (r:back-ref standard n)
   (string-append "\\" (number->string n)))
@@ -138,29 +138,29 @@
        (r:quote std "a") (r:dot std) (r:quote std "c") 
        (r:seq std (r:* std (r:quote std "xy")))
        (r:back-ref std 1))
-	   
+
 ; this appears to return correct regular expressions. Just annoying that you have to keep passing in `std'
 ; Below, I define a function that adds in the `std' argument everywhere it is needed, so that a user can just deal
 ; with code that doesn't have any ERE vs. BRE business, and then compile it later using `(add-args code standard)'
 ; where they will pass in their code and an argument indicating ERE vs. BRE.
 
 (define (add-args code std)
-	(cond
-		((eq? code '()) '())
-		((list? code)
-			(if (memv (car code) '(r:+ r:* r:repeat r:char-not-from r:char-from r:quote r:seq r:alt r:back-ref r:dot r:bol r:eol))
-			  	(append (list (car code) std)
-				      	(map (lambda (expr) (add-args expr std))
-						   	 (cdr code)))
-				(append (cons (add-args (car code) std)
-		 				      (map (lambda (expr) (add-args expr std))
-		 						   (cdr code))))))
-	    (else code)))
+  (cond
+    ((eq? code '()) '())
+    ((list? code)
+     (if (memv (car code) '(r:+ r:* r:repeat r:char-not-from r:char-from r:quote r:seq r:alt r:back-ref r:dot r:bol r:eol))
+       (append (list (car code) std)
+               (map (lambda (expr) (add-args expr std))
+                    (cdr code)))
+       (append (cons (add-args (car code) std)
+                     (map (lambda (expr) (add-args expr std))
+                          (cdr code))))))
+    (else code)))
 
 (define code
-	'(r:seq 
-	      (r:quote  "a") (r:dot ) (r:quote  "c") 
-		  (r:seq  (r:*  (r:quote  "xy")))))
+  '(r:seq 
+     (r:quote  "a") (r:dot ) (r:quote  "c") 
+     (r:seq  (r:*  (r:quote  "xy")))))
 
 
 (eval (add-args code bre) (the-environment))

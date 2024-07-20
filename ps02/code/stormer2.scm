@@ -32,8 +32,8 @@
     (let ((step (stepper h integrator)))
       (define (evolve history n-steps)
         (if (n:> n-steps 0)
-            (evolve (step history) (n:- n-steps 1))
-            history))
+          (evolve (step history) (n:- n-steps 1))
+          history))
       evolve)))
 
 #|
