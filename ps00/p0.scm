@@ -2,7 +2,8 @@
 ;;;; 6.945 Problem Set 0
 ;;;; February 17, 2017
 
-(load "~/Dropbox (MIT)/Classes/6.945/ps00/p0utils.scm")
+; (load "~/Dropbox (MIT)/Classes/6.945/ps00/p0utils.scm")
+(load "p0utils.scm")
 
 #|
 Problem 1
@@ -94,7 +95,7 @@ Problem 2
 #|
 The order of growth in time is O(b).
 The order of growth in space is O(b).
-`slow-exptmod' uses an iterative algorithm.
+`slow-exptmod' uses an iterative algorithm. (IMHO Wrong)
 |#
 
 ; Question (b)
@@ -106,6 +107,7 @@ The order of growth in space is O(b).
     (define (em base exponent)
       (cond ((= exponent 0) 1)
             ((= exponent 1) (modulo base p))
+            ;; This is better than sci-42ver/SICP_SDF although it is also implied in SICP exercise (This is by memory, I can't remember the exact location.)
             (else (mod* (em (square base) (quotient exponent 2))
                         (em base (remainder exponent 2))))))
     em))
@@ -132,6 +134,8 @@ The order of growth in space is O(b).
 Order of growth in time: (O (log b))
 Order of growth in space: (O (log b))
 This is a recursive algorithm.
+
+IMHO This is iterative since no outer variable exists when calling `em`. So space -> \Theta(1).
 |#
 
 ; Problem 3
@@ -164,7 +168,7 @@ This is a recursive algorithm.
 (random-k-digit-number 0)
 ;Value: 0
 
-(random-k-digit-number -1)
+; (random-k-digit-number -1)
 ; does not return... procedure only specified to take an integer k > 0, so I'm not going to worry about this case.
 
 ; Question (b)
@@ -173,6 +177,7 @@ This is a recursive algorithm.
   (define (count-digits-iter n d)
     (if (= n 0)
       d
+      ;; share the similar idea as `split-number`.
       (count-digits-iter (quotient n 10) (+ d 1))))
   (count-digits-iter n 0))
 
@@ -233,7 +238,8 @@ This is a recursive algorithm.
 ; Problem 4
 
 #|
-(a) Order of growth in time: (O n)  [by this I mean what would commonly be written as O(n), but I want to use prefix notation here!]. This is because the program has to check each integer k, where 2 <= k <= n, and determine if k is a factor of n. Assuming that (remainder k n) is a constant-time operation with respect to k and n (which is probably not quite true, but likely to be small, perhaps logarithmic in n), then we can see that `remainder' will be called up to n times.
+(a) Order of growth in time: (O n)  [by this I mean what would commonly be written as O(n), but I want to use prefix notation here!]. This is because the program has to check each integer k, where 2 <= k <= n, and determine if k is a factor of n.
+Assuming that (remainder k n) is a constant-time operation with respect to k and n (which is probably not quite true, but likely to be small, perhaps logarithmic in n), then we can see that `remainder' will be called up to n times.
 Order of growth in space: (O 1).
 This is because the process evolves as follows:
 (slow-prime? 5)
@@ -261,12 +267,29 @@ slow-prime? uses an iterative algorithm.
     ((= a b) (list b))
     (else '())))
 
+; (define (fermat-check-all-cases p)
+;   ; Here rec to ensure `reduce_and` work. Or we just use `define`.
+;   (letrec ((expt-p (exptmod p))
+;         (reduce_and 
+;           (lambda (lst)
+;             (cond ((null? lst) #t)
+;                   ((equal? (car lst) #f) #f)
+;                   (else (reduce_and (cdr lst)))))))
+;     (reduce_and (map (lambda (a)
+;           (= a
+;             (expt-p a p)))
+;         (from-a-to-b 0 (- p 1))))))
+
 (define (fermat-check-all-cases p)
   (let ((expt-p (exptmod p)))
-    (map (lambda (a)
+    ;; https://stackoverflow.com/questions/23186949/scheme-using-and-operator-on-reduce#comment35464574_23186949
+    (reduce 
+      (lambda (x y) (and x y))
+      #t
+      (map (lambda (a)
            (= a
               (expt-p a p)))
-         (from-a-to-b 0 (- p 1)))))
+         (from-a-to-b 0 (- p 1))))))
 
 
 (fermat-check-all-cases 5)
@@ -293,6 +316,7 @@ slow-prime? uses an iterative algorithm.
       ((< p 2) #f)
       ((<= n-iter 0) #t)
       (else
+        ;; This doesn't use one wrapper but the idea is same as sci-42ver/SICP_SDF.
         (let ((a (big-random (- p 1))))
           (if (= ((exptmod p) a p) a)
             (prime?-iter p (- n-iter 1))
@@ -341,6 +365,7 @@ slow-prime? uses an iterative algorithm.
 ; Quite a speed-up from the (O (sqrt p)) order of growth in time with Ben Bitdittle's proposals!
 
 ; Order of growth in space: (O (log p)), which provides bits to record the value of p, which may be large.
+;; IMHO the space to store p should not be considered as "Order of growth in space". (See what this means in one recursive algorithm)
 
 ; This procedure uses an iterative algorithm.
 
@@ -417,6 +442,7 @@ slow-prime? uses an iterative algorithm.
 
 (define (inversemod n)
   (lambda (e)
+    ;; IMHO this error will occur in ax+by=1, so we should throw it there.
     (if (not (= (gcd e n) 1))
       (error "inversemod requires (= (gcd e n) 1)")
       ; find d such that ed = 1 (mod n)
@@ -488,8 +514,8 @@ slow-prime? uses an iterative algorithm.
 (eg-send-message "Hi there, Alyssa. 1234567890 0123456789" Alyssa)
 ;Value 46: "Hi there, Alyssa. 1234567890 0123456789"
 
-(eg-send-message "Hi there, Alyssa. 1234567890 0123456789 00" Alyssa)
-;Value 47: "¬Q\016à­c\017²Ô$$\022´²ÀAÊ\210à°Æ}\210°P\nªDÍ|ð°\024x_Ã\213´\223/_"
+(eg-send-message "Hi there, Alyssa. 1234567890 0123456789 00" Alyssa) ; len 42 -> error. See sci-42ver/SICP_SDF
+;Value 47: "ï¿½Q\016ï¿½c\017ï¿½ï¿½$$\022ï¿½ï¿½ï¿½Aï¿½\210ï¿½ï¿½}\210ï¿½P\nï¿½Dï¿½|ï¿½\024x_ï¿½\213ï¿½\223/_"
 
 (eg-send-message "Hi there, Alyssa. 1234567890 0123456789 0" Alyssa)
 ;Value 48: "Hi there, Alyssa. 1234567890 0123456789 0"
@@ -506,7 +532,7 @@ slow-prime? uses an iterative algorithm.
         (receiver-decryption-procedure
           (eg-receiver-decryption-procedure receiver)))
     (let ((dh-system (eg-public-key-system receiver-public-key)))
-      (let ((my-receiver (eg-receiver dh-system)))
+      (let ((my-receiver (eg-receiver dh-system))) ; new receiver with new "my-secret" -> "advertised-number" -> "public-key" (But this needs access to the lib which may be impossible)
         (let ((my-public-key (eg-receiver-public-key my-receiver))
               (my-decryption-procedure
                 (eg-receiver-decryption-procedure my-receiver)))
@@ -515,8 +541,9 @@ slow-prime? uses an iterative algorithm.
                     (let ((message (my-decryption-procedure ciphertext)))
                       (write message)
                       (newline)
+                      ;; This in the end calls `decryption-procedure`.
                       (eg-send-message (string-append message ", good friend ;)") receiver))))) 
-            (eg-make-receiver my-public-key
+            (eg-make-receiver my-public-key ; IMHO this is not as expected for communication since the sender can use public-key to choose the receiver.
                               my-spying-procedure)))))))
 
 (define Eve-il-Alyssa (Eve-il Alyssa))
@@ -534,3 +561,7 @@ slow-prime? uses an iterative algorithm.
 ;; Eve-il's decryption procedure proceeds to decrypt Ben's message, print it out,
 ;; then re-encrypt it (with some extra stuff appended) and send it to Alyssa,
 ;; who is none-the-wiser to this.
+
+;; IMHO the "own public key" may be marked as invalid by Ben since many blogs have their "public key"s shared.
+
+;; "none-the-wiser to this." since the `receiver` parameter is correct and the procedure doesn't use any global variable.
