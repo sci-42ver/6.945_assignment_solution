@@ -287,9 +287,9 @@ slow-prime? uses an iterative algorithm.
       (lambda (x y) (and x y))
       #t
       (map (lambda (a)
-           (= a
-              (expt-p a p)))
-         (from-a-to-b 0 (- p 1))))))
+             (= a
+                (expt-p a p)))
+           (from-a-to-b 0 (- p 1))))))
 
 
 (fermat-check-all-cases 5)
