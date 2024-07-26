@@ -38,9 +38,10 @@
   (apply r:seq
          (list
            expr
+           ;; since (display "\\\{") is same as (display "\\{"). Both are ok.
            "\\\{"
            (number->string min)
-           ","
+           "," ; not needed when min=max.
            (if max
              (number->string max)
              "")
@@ -104,6 +105,7 @@
   (and (string=? "\[" (string-head expr 1))
        (string=? "\]" (string-tail expr (- (string-length expr) 1)))))
 
+;; This is considered when using {min,max} where we must capture the word instead of the single character.
 (define (parenthesize-if-needed expr)
   (if (or
         (= (string-length expr) 1)

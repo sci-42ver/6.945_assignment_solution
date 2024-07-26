@@ -67,7 +67,7 @@
                              (cdr exprs))))
     (r:seq)))
 
-
+;; the basic idea is same as SDF_exercises/software/sdf/regular-expressions/regexp.scm but with the different cond order.
 (define (r:repeat min max expr)
   (apply r:seq
          (append (make-list min expr)
