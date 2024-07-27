@@ -105,6 +105,7 @@
                         (string->list string))
             (list #\'))))
 
+;; The above is almost same as SDF_exercises/software/sdf/regular-expressions/regexp.scm with small coding style differences maybe due to code base difference.
 
 ;;; This is MIT/Scheme specific and compatible with grep for the
 ;;; purposes of this code.
@@ -126,8 +127,7 @@
   (let ((port (open-output-string)))
     (run-synchronous-subprocess "grep"
                                 (list expr filename)
-                                'output
-                                port)
+                                'output port)
     (r:split-lines (get-output-string port))))
 
 
@@ -203,4 +203,7 @@
 ;Unspecified return value
 |#
 
-
+; (pp (r:grep 'bre (r:seq (r:quote "a") (r:dot) (r:quote "c")) "tests.txt"))
+; (r:grep 'bre (r:seq (r:quote "a") (r:dot) (r:quote "c")) "tests.txt")
+; (pp (local-decoded-time))
+; (local-decoded-time)

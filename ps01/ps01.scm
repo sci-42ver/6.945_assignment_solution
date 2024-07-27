@@ -102,12 +102,14 @@
           (string=? "\\)" (string-tail expr (- (string-length expr) 2)))))))
 
 (define (bracketed? expr)
+  ;; `(string=? "\[" "[")` -> #t. So both are ok.
   (and (string=? "\[" (string-head expr 1))
        (string=? "\]" (string-tail expr (- (string-length expr) 1)))))
 
 ;; This is considered when using {min,max} where we must capture the word instead of the single character.
 (define (parenthesize-if-needed expr)
   (if (or
+        ;; the first is wrong. See chebert single-char?.
         (= (string-length expr) 1)
         (parenthesized? expr)
         (bracketed? expr))
@@ -130,7 +132,7 @@
     (parenthesize-if-needed expr)
     "\\\{"
     (number->string min)
-    ","
+    "," ; not needed when min=max.
     (if max
       (number->string max)
       "")
@@ -187,10 +189,19 @@ around it. Otherwise, they do need to add parens around it.
 ;     BRE does not support alternation (|)
 ;     ERE does not support back-references
 
+;; The above "ERE allows matching of the $ sign only with [$]" is wrong since `echo "$" | grep -E '\$' -` works. And POSIX put $ in both 9.3.3 BRE Special Characters and 9.4.3 ERE Special Characters.
+
 
 ; (b) 
 
-; Can have an argument to each function that marks whether this is to be done in BRE or ERE, and have it appropriately escape things. As for missing features (i.e. BRE not supporting alternation, ERE not supporting back-references), these will be allowed to pass through regardless. I maybe should have that throw an error... but, because we were already allowing alternation in BREs despite it not being part of the spec, and it seems that many ERE implementations also allow back-references... doesn't seem too dangerous to let them through. Allowing some types of cheating but not others would be even more confusing. There's already enough confusion as to what's allowed where; I'm choosing not to have my code introduce more complication around that. Everything will be allowed through, it'll just depend on the underlying grep/egrep as to whether it'll work -- this code will do its best to put it into the appropriate format based on the choice of BRE or ERE, and then step aside.
+; Can have an argument to each function that marks whether this is to be done in BRE or ERE, and have it appropriately escape things. 
+
+;; The following just says we ignore "... does not support ...".
+; As for missing features (i.e. BRE not supporting alternation, ERE not supporting back-references), these will be allowed to *pass through regardless*. 
+; I maybe should have that throw an error... but, because we were already allowing alternation in BREs despite it not being part of the spec, and it seems that many ERE implementations also allow back-references... doesn't seem too dangerous to let them through. 
+
+; Allowing some types of cheating but not others would be even more confusing. There's already enough confusion as to what's allowed where; I'm choosing not to have my code introduce more complication around that. 
+; Everything will be allowed through, it'll just depend on the underlying grep/egrep as to whether it'll work -- this code will do its best to put it into the appropriate format based on the choice of BRE or ERE, and then *step aside*.
 
 ; (c)
 ; Code and tests for part (c) is in its own file, ps01-1.5c.scm

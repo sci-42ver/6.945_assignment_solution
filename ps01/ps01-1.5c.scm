@@ -1,18 +1,24 @@
-(load "~/Dropbox (MIT)/Classes/6.945/ps01/regexp.scm") ; change this to reflect the directory you are running this from!
+; (load "~/Dropbox (MIT)/Classes/6.945/ps01/regexp.scm") ; change this to reflect the directory you are running this from!
+; (load "~/SICP_SDF/SDF_exercises/software/sdf/regular-expressions/regexp.scm")
+(load "regexp.scm") ; with compatible r:grep
 
 ; Problem 1.5 (c)
 
 ; This code relies on some custom modifications I made to regexp.scm to allow running with grep vs. egrep
 
+;; only adds standard arg.
 (define (r:dot standard) ".")
 (define (r:bol standard) "^")
 (define (r:eol standard) "$")
 
 ; Quotes a character if needed, according to the standard (BRE or ERE)
+;; capture ordinary character. Same as chebert.
 (define (quote-char standard char)
   (case char
-    ((#\. #\[ #\] #\* #\^) (list #\\ char))
-    ((#\$) (list #\[ #\$ #\]))
+    ;; `echo "$" | grep -E '\$' -` works.
+    ; ((#\. #\[ #\] #\* #\^) (list #\\ char))
+    ; ((#\$) (list #\[ #\$ #\]))
+    ((#\. #\[ #\] #\* #\^ #\$) (list #\\ char))
     ((#\( #\) #\? #\+ #\{ #\})
      (if (eq? standard 'bre)
        char
@@ -25,6 +31,7 @@
                   (quote-char standard char))
                 (string->list string))))
 
+;; only adds standard arg.
 (define (r:char-from standard string)
   (case (string-length string)
     ((0) (r:seq standard))
@@ -36,17 +43,20 @@
                    '(#\- #\^)
                    (quote-bracketed-contents members)))))))
 
+;; only adds standard arg.
 (define (r:char-not-from standard string)
   (bracket string
            (lambda (members)
              (cons #\^ (quote-bracketed-contents members)))))
 
+;; same as code base
 (define (bracket string procedure)
   (list->string
     (append '(#\[)
             (procedure (string->list string))
             '(#\]))))
 
+;; same as code base
 (define (quote-bracketed-contents members)
   (let ((optional
           (lambda (char) (if (memv char members) (list char) '()))))
@@ -60,14 +70,17 @@
 
 ;;; Means of combination for patterns
 
+;; addition based on code base.
 (define (make-special standard char)
   (list->string
     (case char
+      ;; | is assumed to be supported by BRE.
       ((#\( #\) #\{ #\} #\|) (case standard
                                ('bre (list #\\ char))
                                ('ere (list char))))
       (else (list char)))))
 
+;; only adds standard arg.
 (define (r:seq . (standard . exprs))
   (string-append 
     (make-special standard #\()
@@ -78,6 +91,8 @@
 
 ;;; An extension to POSIX basic regular expressions.
 ;;; Supported by GNU grep and possibly others.
+
+;; only adds standard arg.
 (define (r:alt . (standard . exprs))
   (if (pair? exprs)
     (apply r:seq
@@ -88,6 +103,7 @@
                              (cdr exprs))))
     (r:seq)))
 
+;; See 2.8: beginning
 (define (parenthesized? standard expr)
   (case standard
     ('ere
@@ -119,13 +135,17 @@
       (number->string max)
       "")
     (make-special standard #\})))
+;; See 2.8: ending
 
+;; See 2.6: beginning
 (define (r:* standard expr)
   (r:repeat standard 0 #f expr))
 
 (define (r:+ standard expr)
   (r:repeat standard 1 #f expr))
+;; See 2.6: ending
 
+;; ;; only adds standard arg.
 (define (r:back-ref standard n)
   (string-append "\\" (number->string n)))
 
@@ -152,9 +172,9 @@
        (append (list (car code) std)
                (map (lambda (expr) (add-args expr std))
                     (cdr code)))
-       (append (cons (add-args (car code) std)
-                     (map (lambda (expr) (add-args expr std))
-                          (cdr code))))))
+       (cons (add-args (car code) std) ; Here list is thought as one minimal procedure. So we should not append somthing after it.
+              (map (lambda (expr) (add-args expr std))
+                  (cdr code)))))
     (else code)))
 
 (define code
