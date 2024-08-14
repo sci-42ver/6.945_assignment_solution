@@ -173,7 +173,7 @@
                (map (lambda (expr) (add-args expr std))
                     (cdr code)))
        (cons (add-args (car code) std) ; Here list is thought as one minimal procedure. So we should not append somthing after it.
-              (map (lambda (expr) (add-args expr std))
+             (map (lambda (expr) (add-args expr std))
                   (cdr code)))))
     (else code)))
 
