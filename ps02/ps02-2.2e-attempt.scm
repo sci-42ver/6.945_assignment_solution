@@ -1,6 +1,8 @@
 (ge (make-top-level-environment))
-(cd "/Users/blake/Dropbox\ (MIT)/Classes/6.945/ps02/code")
+; (cd "/Users/blake/Dropbox\ (MIT)/Classes/6.945/ps02/code")
+(cd "~/SICP_SDF/SDF_exercises/software/sdf/manager/")
 (load "load.scm")
+(manage 'new 'combining-arithmetics)
 
 ;;; Problem 2.1 Warmup 
 
@@ -50,9 +52,9 @@
 ;;; Problem 2.2
 ; (a)
 
-(ge (make-top-level-environment))
-(cd "/Users/blake/Dropbox\ (MIT)/Classes/6.945/ps02/code")
-(load "load.scm")
+; (ge (make-top-level-environment))
+; (cd "/Users/blake/Dropbox\ (MIT)/Classes/6.945/ps02/code")
+; (load "load.scm")
 
 (register-predicate! vector? 'vector)
 
@@ -144,6 +146,7 @@
                       vector?
                       base-predicate)
              (v:*-maker base-predicate)))
+          ;; probably this line causes the errors since this is not "operation", so `caddr` throws errors.
           ((negate) (lambda (x) (v:negate x)))
           ((magnitude) (lambda (x) (v:magnitude x)))
           (else

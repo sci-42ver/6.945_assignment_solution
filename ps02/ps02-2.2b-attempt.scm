@@ -94,6 +94,7 @@
                      base-constant)
                    (let ((base-predicate
                            (arithmetic-domain-predicate base-arithmetic)))
+                      ;; IMHO we can just use base-operation
                      (lambda (operator base-operation)
                        (simple-operation
                          operator

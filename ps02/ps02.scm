@@ -1,3 +1,6 @@
+;; https://www.gnu.org/software/mit-scheme/documentation/stable/mit-scheme-ref/REPL-Environment.html#index-ge-1
+;; https://docs.scheme.org/schintro/schintro_122.html
+;; > We say that a procedure is closed in the environment where it is created.
 (ge (make-top-level-environment))
 (cd "/Users/blake/Dropbox\ (MIT)/Classes/6.945/ps02/code")
 (load "load.scm")
@@ -74,6 +77,7 @@
 
 (define (sum l) (reduce + 0 l))
 
+;; we can also use vector-element-wise
 (define (v:+ vector1 vector2)
   (ensure-vector-lengths-match (list vector1 vector2))
   (list->vector
@@ -82,6 +86,7 @@
 (v:+ #(1 2 3) #(4 5 6))
 ;Value 181: #(5 7 9)
 
+;; same as sci-42ver/SDF_exercise_solution
 (define (v:* scalar vec) ((vector-element-wise (lambda (x) (n:* x scalar))) vec))
 
 (v:* -1 #(1 2 3))
@@ -107,6 +112,7 @@
 (define (v:magnitude vector)
   (sqrt (v:dot vector vector)))
 
+;; similar to symbolic-extender
 (define (vector-extender base-arithmetic)
   (make-arithmetic 'vector vector? (list base-arithmetic)
                    (lambda (name base-constant)
@@ -118,6 +124,7 @@
                          operator
                          vector?
                          (case operator
+                          ;; IMHO using base-operation is more appropriate which may allows symbol. 
                            ((+) (lambda (x y) (v:+ x y)))
                            ((-) (lambda (x y) (v:- x y)))
                            ((*) (lambda (x y) (v:dot x y)))
