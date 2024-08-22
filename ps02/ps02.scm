@@ -124,7 +124,7 @@
                          operator
                          vector?
                          (case operator
-                          ;; IMHO using base-operation is more appropriate which may allows symbol. 
+                           ;; IMHO using base-operation is more appropriate which may allows symbol. 
                            ((+) (lambda (x y) (v:+ x y)))
                            ((-) (lambda (x y) (v:- x y)))
                            ((*) (lambda (x y) (v:dot x y)))
