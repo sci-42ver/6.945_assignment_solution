@@ -90,6 +90,7 @@ The generic system is able to support both expressions, using the code below:
 |#
 
 #|
+;; This uses one old code base.
 (let ((g (make-generic-arithmetic simple-generic-dispatcher)))
   (add-to-generic-arithmetic! g numeric-arithmetic)
   (extend-generic-arithmetic! g symbolic-extender)
@@ -123,6 +124,7 @@ Tests:
 (define-generic-procedure-handler vector-new
                                   (all-args 2 (disjoin number? symbol? list?))
                                   (lambda (a b) (n:vector a b)))
+;; These predicates are less general.
 (define-generic-procedure-handler vector-new
                                   (all-args 2 function?)
                                   (lambda (a b) (lambda (x) (vector-new (a x) (b x)))))
@@ -143,6 +145,7 @@ Tests:
 ;Value 25: #(-.9899924966004454 .1411200080598672)
 
 
+;; Since we have recursive calls of vector-new in the above handler.
 ; We can even have vectors of (functions that return functions)!
 
 (define cos-mult
@@ -163,6 +166,7 @@ Tests:
 (* (vector-new 2 3) (vector-new 1 2))
 ;Value: 8
 
+;; here it at some time calls (* (vector-new (cos a) (sin a)) ...) -> (* (n:vector (cos a) (sin a)) ...) 
 ; Can take dot product of this new vector type as well, even when it's still left in functional form:
 ((* (vector-new cos sin) (vector-new cos sin)) 'a)
 ;Value 76: (+ (* (sin a) (sin a)) (* (cos a) (cos a)))
