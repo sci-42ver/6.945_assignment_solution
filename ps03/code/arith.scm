@@ -155,6 +155,13 @@
                  (modification arithmetic))
                modifications)))
     (map (lambda (operator)
+            ; (display 
+            ;   (list 
+            ;     operator
+            ;     (generic-procedure?
+            ;       (make-installable-procedure operator
+            ;                                  arithmetic
+            ;                                  overrides))))
            (cons operator
                  (make-installable-procedure operator
                                              arithmetic
@@ -174,7 +181,9 @@
       (if override
         (make-installable-operation-procedure procedure
                                               (cdr override))
-        procedure))))
+        (begin
+          ; (display (generic-procedure? procedure))
+          procedure)))))
 
 (define (+-like operator identity-name)
   (lambda (arithmetic)

@@ -43,6 +43,8 @@
 (define (any-arg arity predicate base-predicate)
   (if (n:= 0 arity)
     (list)
+    ;; This is different from sci-42ver/SDF_exercise_solution where we removes the case of all base-predicate's.
+    ;; Here it returns (predicate joint joint ...), (joint predicate joint ...) ...
     (let ((joint-predicate (disjoin base-predicate predicate)))
       (map (lambda (i)
              (map (lambda (j)

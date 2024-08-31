@@ -1,7 +1,7 @@
 					
 
 (ge (make-top-level-environment))
-(cd "/mit/eliasb/Desktop/6.945/ps03/code")
+(cd "./code")
 (load "load.scm")
 
 ;;; Vector Extender (from ps02)
@@ -235,9 +235,9 @@ This does have a couple of shortcomings:
 ; No, there is still the same dependence on order -- the last extender that is applied is the one that takes priority. 
 
 ; Try it in one order:
-#|
+
 (ge (make-top-level-environment))
-(cd "/Users/blake/Dropbox\ (MIT)/Classes/6.945/ps03/code")
+; (cd "./code")
 (load "load.scm")
 
 (define trie-full-generic-arithmetic
@@ -247,13 +247,19 @@ This does have a couple of shortcomings:
     (extend-generic-arithmetic! g function-extender)
     g))
 (install-arithmetic! trie-full-generic-arithmetic)
-|#
+
 
 ; It works!
-#|
+;; fail due to `+-like`. Also see sci-42ver/SDF_exercise_solution werid behavior of `generic-procedure-metadata`.
+; (generic-procedure? +)
+; (display (generic-procedure-rules +))
+
+;; See sci-42ver/SDF_exercise_solution. The different any-arg causes the different results.
+(any-arg 2
+        symbolic?
+        number?)
 (+ 'a ((+ 'c cos sin) (* 2 'b)))
 ;Value 137: (+ a (+ (+ c (cos (* 2 b))) (sin (* 2 b))))
-|#
 
 
 ; Try the other order!
@@ -301,6 +307,7 @@ There can be more than one appropriate handler for a sequence of arguments if th
 |#
 
 ; 3.5 (c)
+; IMHO this is wrong since we have any-object?. See sci-42ver/SDF_exercise_solution.
 #|
 In the generic arithmetic code we have written so far, there are no such situations. The predicates symbolic?, vector?, number? and function? are mutually exclusive. However, if one defined some new argument predicates which had overlap with these existing ones (eg. (or vector? number?), which will have overlap with vector? in terms of which arguments it returns #t for), then there can be more than one handler for a sequence of arguments.
 |#
