@@ -422,7 +422,8 @@ On the other hand, if there are many rules which share a common pre-fix, then tr
 
 
 ; Problem 4.0
-
+;; I won't dig into this part since any-arg is different.
+;; But the "many fewer calls to each predicate!!" is obviously right.
 
 (define (generic-dispatcher)
   (cached-generic-dispatcher implementation-type-name))
