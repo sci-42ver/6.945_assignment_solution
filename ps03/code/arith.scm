@@ -155,13 +155,13 @@
                  (modification arithmetic))
                modifications)))
     (map (lambda (operator)
-            ; (display 
-            ;   (list 
-            ;     operator
-            ;     (generic-procedure?
-            ;       (make-installable-procedure operator
-            ;                                  arithmetic
-            ;                                  overrides))))
+           ; (display 
+           ;   (list 
+           ;     operator
+           ;     (generic-procedure?
+           ;       (make-installable-procedure operator
+           ;                                  arithmetic
+           ;                                  overrides))))
            (cons operator
                  (make-installable-procedure operator
                                              arithmetic

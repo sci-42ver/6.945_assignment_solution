@@ -256,8 +256,8 @@ This does have a couple of shortcomings:
 
 ;; See sci-42ver/SDF_exercise_solution. The different any-arg causes the different results.
 (any-arg 2
-        symbolic?
-        number?)
+         symbolic?
+         number?)
 (+ 'a ((+ 'c cos sin) (* 2 'b)))
 ;Value 137: (+ a (+ (+ c (cos (* 2 b))) (sin (* 2 b))))
 
