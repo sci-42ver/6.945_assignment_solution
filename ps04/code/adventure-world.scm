@@ -119,7 +119,7 @@
   (if (eqv? person my-avatar)
     "Your"
     (possessive person)))
-
+
 (define (create-mit)
   (let ((great-dome (create-place 'great-dome))
         (little-dome (create-place 'little-dome))

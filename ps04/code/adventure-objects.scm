@@ -319,6 +319,8 @@
                                     (super agent)))
 
 (define (move-and-take-stuff! agent)
+  ;; to notify avatar for possible unknown states, e.g. president and troll may be at the same place.
+  (displayln (list (get-name agent) "will move-and-take-stuff"))
   (if (flip-coin (get-restlessness agent))
     (move-somewhere! agent))
   (if (flip-coin (get-acquisitiveness agent))
@@ -415,7 +417,7 @@
                   troll)))))
 
 (define-clock-handler troll? eat-people!)
-
+
 ;;; Avatars
 
 (define avatar:screen
