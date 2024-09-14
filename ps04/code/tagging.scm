@@ -108,7 +108,7 @@
 
   (define (predicate object)
     (and (tagged-data? object)
-          ;; See set-predicate<=! for when this will return #t.
+         ;; See set-predicate<=! for when this will return #t.
          (tag<= (tagged-data-tag object) tag)
          (data-test (tagged-data-data object))))
 
