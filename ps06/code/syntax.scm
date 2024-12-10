@@ -50,7 +50,7 @@
     (cons 'lambda				;;   (DEFINE (foo p...) b...)
           (cons (cdadr defn)			;; = (DEFINE  foo
                 (cddr  defn)))))		;;     (LAMBDA (p...) b...))
-
+
 ;;; LAMBDA expressions
 
 (define (lambda? exp) (tagged-list? exp 'lambda))
@@ -84,7 +84,7 @@
         (else (make-begin seq))))
 
 (define (make-begin exp) (cons 'begin exp))
-
+
 ;;; If conditionals
 
 (define (if? exp) (tagged-list? exp 'if))
@@ -132,7 +132,7 @@
                      (expand (cdr clauses))))))
   (expand (clauses cond-exp)))
 
-
+
 ;;; BEGIN expressions (a.k.a. sequences)
 
 (define (begin? exp) (tagged-list? exp 'begin))
@@ -180,7 +180,7 @@
 (define (no-operands? args) (null? args))
 (define (first-operand args) (car args))
 (define (rest-operands args) (cdr args))
-
+
 ;;; Another special form that will be needed later.
 
 (define (amb? exp)

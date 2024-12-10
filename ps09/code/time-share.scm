@@ -16,7 +16,7 @@
 (define time-sharing:quantum 1) 
 (define time-sharing-enabled? #t)
 (define time-sharing? #f)
-
+
 ;;; This is an MIT/GNU Scheme specific detail.  register-timer-event
 ;;; is the MIT/GNU Scheme mechanism for delivering a timer interrupt.
 ;;; When the time specified by its first argument expires, it invokes
@@ -43,7 +43,7 @@
 
 (define (stop-time-sharing)
   (set! time-sharing? #f))
-
+
 ;;; without-interrupts is an MIT Scheme mechanism that turns off
 ;;; all timer interrupts.  It executes its thunk atomically.
 

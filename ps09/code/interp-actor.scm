@@ -98,7 +98,7 @@
                                    (eval (assignment-value expression) environment)
                                    environment))
             assignment?)
-
+
 ;;; Pavel's hack for making map-like things work (see ps03)
 
 (define backport
@@ -140,7 +140,7 @@
                                                 (backport x calling-environment))
                                               (evaluate-list operands))))
             strict-primitive-procedure?)
-
+
 (defhandler apply
             (lambda (procedure operands calling-environment)
               (if (not (= (length (procedure-parameters procedure))

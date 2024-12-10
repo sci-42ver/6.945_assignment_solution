@@ -29,7 +29,7 @@
                                                   (lambda () #f)))))))
           (fail)))
     the-rule))
-
+
 (define-syntax rule
   (sc-macro-transformer
     (lambda (form use-env)

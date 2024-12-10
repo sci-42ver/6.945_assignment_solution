@@ -39,7 +39,7 @@
           (else
             (to-do)
             (root-continuation 'go)))))
-
+
 (define (add-to-runnable! actor)
   (atomically
     (lambda ()
@@ -55,7 +55,7 @@
       (queue:add-to-end! (get-actor-task-queue actor) task)))
   (add-to-runnable! actor)
   'task-added)
-
+
 ;;; We use the queue design similar to SICP Section 3.3.2
 
 (define-record-type queue

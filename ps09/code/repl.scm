@@ -32,7 +32,7 @@
 (defhandler pp
             (compose pp procedure-printable-representation)
             compound-procedure?)
-
+
 (define (read) (prompt-for-command-expression "eval> "))
 
 (define the-global-environment 'not-initialized)

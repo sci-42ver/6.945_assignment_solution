@@ -26,7 +26,7 @@
 ;;; second argument is rejected.  Here backtracking is
 ;;; implemented using #f as a failure return, requiring
 ;;; further search.
-
+
 #| ;;; For example.
 (define foo (make-generic-operator 2 'foo))
 
@@ -54,7 +54,7 @@
 (foo '(+ a 1) '(+ 1 a))
 ;Value: (+ (+ a 1) (+ 1 a))
 |#
-
+
 (define (make-generic-operator arity
                                #!optional name default-operation)
   (let ((record (make-operator-record arity)))
@@ -82,7 +82,7 @@
 
     (assign-operation operator default-operation)
     operator))
-
+
 #|
 ;;; To illustrate the structure we populate the
 ;;; operator table with quoted symbols rather 
@@ -105,7 +105,7 @@
  .
  blend-default)
 |#
-
+
 #|
 ;;; Backtracking
 
@@ -125,7 +125,7 @@
 ;;; Consider what happens if we invoke
 ;;; (blend <bleen> <blue>)
 |#
-
+
 ;;; This is the essence of the search.
 
 (define (find-handler tree args)
@@ -145,7 +145,7 @@
                (loop (cdr tree))))
           ((null? tree) #f)
           (else tree))))
-
+
 (define (assign-operation operator handler
                           . argument-predicates)
   (let ((record (get-operator-record operator))
@@ -166,7 +166,7 @@
   operator)
 
 (define defhandler assign-operation)
-
+
 (define (bind-in-tree keys handler tree replace!)
   (let loop ((keys keys) (tree tree) (replace! replace!))
     (cond ((pair? keys)   ; more argument-predicates
@@ -189,7 +189,7 @@
                  (replace! better-tree)
                  (loop keys better-tree replace!)))))
           ;; cond continues on next page.
-          
+          
           ((pair? tree)  ; no more argument predicates.
            ;; There is more discrimination list here,
            ;; because my predicate list is a proper prefix
@@ -209,7 +209,7 @@
             (if (not (null? tree))
               (warn "Replacing a handler:" tree handler))
             (replace! handler)))))
-
+
 (define *generic-operator-table* (make-eq-hash-table))
 
 (define (get-operator-record operator)
@@ -230,7 +230,7 @@
     (and (fix:<= (procedure-arity-min arity) len)
          (or (not (procedure-arity-max arity))
              (fix:>= (procedure-arity-max arity) len)))))
-
+
 #|
 ;;; Demonstration of handler tree structure.
 ;;; Note: symbols were used instead of procedures
@@ -254,7 +254,7 @@
  (a (c . two-arg-a-c) (b . two-arg-a-b))
  . foo-default)
 |#
-
+
 #|
 (defhandler foo 'one-arg-b 'b)
 (pp (get-operator-record foo))
@@ -276,7 +276,7 @@
 (defhandler foo 'two-arg-a-b-prime 'a 'b)
 ;Warning: Replacing a handler: 
 ;         two-arg-a-b two-arg-a-b-prime
-
+
 (defhandler foo 'three-arg-x-y-z 'x 'y 'z)
 (pp (get-operator-record foo))
 (3 (x (y (z . three-arg-x-y-z)))
@@ -288,7 +288,7 @@
  .
  foo-default)
 |#
-
+
 ;;; Compatibility with previous extensible generics
 
 (define make-generic-operation make-generic-operator)

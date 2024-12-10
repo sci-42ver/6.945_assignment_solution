@@ -22,7 +22,7 @@
 ;;; list is improper, then the cdr at the end of the backbone of the
 ;;; alist is the default handler to apply (all remaining arguments are
 ;;; implicitly accepted).
-
+
 (define (make-generic-operator arity #!optional name default-operation)
   (let ((record (make-operator-record arity)))
     (define (find-branch tree arg win)
@@ -64,7 +64,7 @@
 
 (define *generic-operator-table*
   (make-eq-hash-table))
-
+
 (define (get-operator-record operator)
   (hash-table/get *generic-operator-table* operator #f))
 
@@ -101,7 +101,7 @@
   operator)
 
 (define defhandler assign-operation)
-
+
 (define (bind-in-tree keys handler tree replace!)
   (let loop ((keys keys) (tree tree) (replace! replace!))
     (if (pair? keys)
@@ -143,7 +143,7 @@
           (if (not (null? tree))
             (warn "Replacing a handler:" tree handler))
           (replace! handler))))))
-
+
 #|
 ;;; Demonstration of handler tree structure.
 ;;; Note: symbols were used instead of procedures

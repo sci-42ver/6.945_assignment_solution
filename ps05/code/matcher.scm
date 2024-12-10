@@ -53,7 +53,7 @@
 
 (define (match:value vcell)
   (cadr vcell))
-
+
 (define (match:segment variable)
   (define (segment-match data dictionary succeed)
     (and (list? data)
@@ -102,7 +102,7 @@
                   (succeed dictionary 1))
                  (else #f)))))
   list-match)
-
+
 ;;; Syntax of matching is determined here.
 
 (define (match:element? pattern)
@@ -148,7 +148,7 @@
                         (lambda (dictionary n)
                           (and (= n 1)
                                dictionary))))))
-
+
 #|
 (define (report-success dict n)
   (assert (= n 1))
@@ -190,7 +190,7 @@
  '(a (1 2 3) 1 c))
 ;Value: ((b 1))
 |#
-
+
 ;;; Nice pattern inspection procedure that will be used by the
 ;;; pattern-directed invocation system.
 

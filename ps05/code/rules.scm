@@ -41,7 +41,7 @@
                    (lambda ()
                      (per-rule (cdr rules)))))))
 
-
+
 ;;; A simple set of rules.
 
 (define algebra-1

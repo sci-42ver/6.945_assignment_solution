@@ -46,7 +46,7 @@
                 (eval (if-consequent expression) environment)
                 (eval (if-alternative expression) environment)))
             if?)
-
+
 (defhandler eval
             (lambda (expression environment)
               (eval (cond->if expression) environment))
@@ -86,7 +86,7 @@
                                    (eval (assignment-value expression) environment)
                                    environment))
             assignment?)
-
+
 (define apply
   (make-generic-operator 3 'apply default-apply))
 

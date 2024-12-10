@@ -47,7 +47,7 @@ http://groups.csail.mit.edu/mac/projects/scheme/documentation/scheme_11.html#SEC
 (define (procedure-body p) (vector-ref p 2))
 (define (procedure-environment p) (vector-ref p 3))
 |#
-
+
 ;;; An ENVIRONMENT is a chain of FRAMES, made of vectors.
 
 (define (extend-environment variables values base-environment)
@@ -92,7 +92,7 @@ http://groups.csail.mit.edu/mac/projects/scheme/documentation/scheme_11.html#SEC
              (set-car! vals val))
             (else
               (scan (cdr vars) (cdr vals)))))))
-
+
 (define (set-variable-value! var val env)
   (let plp ((env env))
     (if (eq? env the-empty-environment)

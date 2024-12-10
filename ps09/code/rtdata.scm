@@ -46,7 +46,7 @@ http://groups.csail.mit.edu/mac/projects/scheme/documentation/scheme_11.html#SEC
 
 (define (make-actor-procedure vars bproc env)
   (make-actor-procedure% vars bproc env (queue:make) #f))
-
+
 ;;; An ENVIRONMENT is a chain of FRAMES, made of vectors.
 
 (define (extend-environment variables values base-environment)
@@ -77,7 +77,7 @@ http://groups.csail.mit.edu/mac/projects/scheme/documentation/scheme_11.html#SEC
 
 (define (lookup-scheme-value var)
   (lexical-reference generic-evaluation-environment var))
-
+
 (define (define-variable! var val env)
   (if (eq? env the-empty-environment)
     (error "Unbound variable -- DEFINE" var) ;should not happen.

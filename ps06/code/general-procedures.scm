@@ -42,7 +42,7 @@
 
 (define (undelayed-value x)
   (vector-ref x 1))
-
+
 ;;; Evaluator extension -- change to IF:
 ;;;  Must have actual predicate value to proceed from IF.
 
@@ -71,7 +71,7 @@
                      operands
                      calling-environment))
             undelayed-memo?)
-
+
 ;;; This handler was replaced so it can get values of arguments for
 ;;; strict primitives.
 
@@ -101,7 +101,7 @@
             (lambda (parameter operand environment)
               (delay-memo operand environment))
             lazy-memo?)
-
+
 (define undelay!
   (make-generic-operator 1 'undelay! (lambda (x) x)))
 
