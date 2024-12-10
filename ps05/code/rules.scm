@@ -93,7 +93,7 @@
 (algebra-1 '(* (+ y (+ z w)) x))
 ;Value: (+ (+ (* x y) (* x z)) (* w x))
 |#
-
+
 (define algebra-2
   (rule-simplifier
     (list
@@ -127,7 +127,7 @@
       (rule `(* (?? a) (+ (?? b)) (?? c))
             `(+ ,@(map (lambda (x) `(* ,@a ,x ,@c)) b)))
 
-      
+      
       ;; Numerical simplifications below
 
       (rule `(+ 0 (?? x)) `(+ ,@x))
