@@ -28,7 +28,7 @@
 
 (define (similar-packages? p1 p2)
   (lset= eq? (package-names p1) (package-names p2)))
-
+
 ;;; This installer is MIT/GNU Scheme specific:
 (define (package-installer environment)
   (lambda (package)

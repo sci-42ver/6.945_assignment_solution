@@ -45,7 +45,7 @@
               (else (error "Unknown domain:" indicator))))))
     (values (map mapper (operator-domains operator))
             (mapper (operator-codomain operator)))))
-
+
 (define %arithmetic-operator-alist
   '((* (domain domain) domain)
     (+ (domain domain) domain)

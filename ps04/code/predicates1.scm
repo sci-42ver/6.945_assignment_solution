@@ -28,7 +28,7 @@
 
 (define (simple-abstract-predicate name data-test)
   (make-simple-predicate name data-test tagging-strategy:always))
-
+
 (define have-compound-operator-registrar?)
 (define get-compound-operator-registrar)
 (define define-compound-operator-registrar)
@@ -59,7 +59,7 @@
 
 (define-compound-operator-registrar 'is-pair-of
                                     (make-listish-memoizer))
-
+
 (define (joinish wrap-constructor)
   (let ((memoizer
           (simple-lset-memoizer eq? hash-by-identity
@@ -111,7 +111,7 @@
                                                 (for-each (lambda (tag)
                                                             (set-tag<=! joint-tag tag))
                                                           tags)))))))
-
+
 ;;;; Generic predicate operations
 
 ;; Needed by code in common.
@@ -146,7 +146,7 @@
 (define (set-predicate<=! predicate superset)
   (set-tag<=! (predicate->tag predicate)
               (predicate->tag superset)))
-
+
 ;;;; Simple predicates
 
 (define (simple-predicate? object)
@@ -181,7 +181,7 @@
 
 (define (parametric-predicate-template predicate)
   (parametric-tag-template (predicate->tag predicate)))
-
+
 ;;;; Basic tag structure
 
 (define tag?
@@ -234,7 +234,7 @@
   (constructor tag-shared-constructor)
   (accessor tag-shared-accessor)
   (supersets tag-shared-supersets))
-
+
 (define (make-simple-tag name data-test tagging-strategy)
   (%invoke-tagging-strategy tagging-strategy name data-test
                             %make-simple-tag))
@@ -282,7 +282,7 @@
 
 (define-tag-type parametric-tag? parametric-tag-shared)
 (define-tag-record-printer <parametric-tag>)
-
+
 ;;;; Generic tag operations
 
 (define (tag-name tag)
@@ -320,7 +320,7 @@
                   (append new-sets supersets))
             (loop queue supersets))))
       supersets)))
-
+
 (define (set-tag<=! tag superset)
   (if (tag>= tag superset)
     (error "Not allowed to create a superset loop:"
@@ -352,7 +352,7 @@
 
 (define (internal-tag>= tag1 tag2)
   (internal-tag<= tag2 tag1))
-
+
 (define generic-tag<=
   (simple-generic-procedure 'generic-tag<= 2))
 
@@ -412,7 +412,7 @@
                               (compound-tag-components tag1)))
                       ;; TODO(cph): add more rules here.
                       (else #f))))
-
+
 ;;;; Registrations for this file
 
 ;; These must be the first registrations!

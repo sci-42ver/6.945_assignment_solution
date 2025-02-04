@@ -39,7 +39,7 @@
                                   (match-args installable-operation-procedure? predicate?)
                                   (lambda (value predicate)
                                     (value-fit (applicable-object->object value) predicate)))
-
+
 ;;; API
 (define (operation-components operation)
   (function-components operation))
@@ -68,7 +68,7 @@
 ;;; API
 (define (simple-operation-procedure operation)
   (simple-function-procedure operation))
-
+
 ;;;; Local extensions to API
 
 (define (extend-operation-function operator base-operation extender)

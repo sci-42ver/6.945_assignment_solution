@@ -40,7 +40,7 @@
     (register-predicate! predicate (symbol name '-predicate))
     (set-predicate<=! predicate parametric-predicate?)
     template))
-
+
 (define (make-predicate-template-tag-instantiator
           name pattern make-data-test tagging-strategy
           get-template)
@@ -96,7 +96,7 @@
                     (eqv? name (parameter-binding-name binding)))
                   (parametric-tag-bindings
                     (predicate->tag predicate)))))))))
-
+
 ;;;; Template patterns
 
 (define (template-pattern? object)
@@ -144,7 +144,7 @@
 
 (define (template-pattern->names pattern)
   (map template-pattern-element-name pattern))
-
+
 (define (match-template-pattern pattern values value-predicate)
   (guarantee n:list? values)
   (if (not (n:= (length values) (length pattern)))

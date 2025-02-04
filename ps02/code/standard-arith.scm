@@ -44,7 +44,7 @@
                                                                      (apply thing args)
                                                                      thing))
                                                                  things)))))))))
-
+
 ;;;; Book examples
 
 (define (make-arithmetic-1 name get-operation)

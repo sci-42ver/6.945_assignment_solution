@@ -51,7 +51,7 @@
                                                                      args)
                                                               (tagger (cons operator args))
                                                               (apply base-operation args))))))))))))
-
+
 ;;;; Function arithmetic
 
 (define (make-endo-function-arithmetic base-arithmetic)
@@ -102,7 +102,7 @@
                                                                               args)
                                                                             operation-arg))
                                                                         operation-args))))))))))))
-
+
 (define (get-object-name object)
   (if (function? object)
     (function-name object)

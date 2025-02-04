@@ -68,7 +68,7 @@
   (filter-map (lambda (base)
                 (find-arithmetic-operation operator base))
               bases))
-
+
 (define (arithmetic-constant-names arithmetic)
   (map car (arithmetic-constant-alist arithmetic)))
 
@@ -124,7 +124,7 @@
 
 (define (extend-arithmetic extension base-arithmetic)
   (add-arithmetics base-arithmetic (extension base-arithmetic)))
-
+
 ;;;; Installation
 
 (define (install-arithmetic! arithmetic)
@@ -175,7 +175,7 @@
         (make-installable-operation-procedure procedure
                                               (cdr override))
         procedure))))
-
+
 (define (+-like operator identity-name)
   (lambda (arithmetic)
     (let ((binary

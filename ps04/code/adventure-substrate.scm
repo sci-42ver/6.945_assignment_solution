@@ -39,7 +39,7 @@
 
 (define property-keywords
   `(predicate ,@property-default-keywords))
-
+
 (define-record-type <property>
   (%make-property name predicate default-supplier)
   property?
@@ -53,7 +53,7 @@
 (define-record-printer <property>
                        (lambda (property)
                          (list (property-name property))))
-
+
 ;;;; Types
 
 (define (make-type name properties)
@@ -78,7 +78,7 @@
   (set! type? (association 'has?))
   (set! %type-properties (association 'get))
   (set! %set-type-properties! (association 'put!)))
-
+
 ;;;; Instantiation
 
 (define (type-instantiator type)
@@ -122,7 +122,7 @@
 (define-generic-procedure-default-handler tear-down!
                                           (lambda (object)
                                             #f))
-
+
 ;;;; Instance data
 
 (define instance-data?
@@ -152,7 +152,7 @@
 
 (define (instance-data-binding property instance-data)
   ((instance-data-bindings instance-data) property))
-
+
 ;;;; Methods
 
 (define (property-getter property type)
@@ -188,7 +188,7 @@
                      debug-output)
       (send-message! (list ";previous value was" old-value)
                      debug-output))))
-
+
 (define (property-modifier property type value-predicate
                            noun modifier)
   (let ((procedure
@@ -215,7 +215,7 @@
   (property-modifier property type value-predicate 'remover
                      (lambda (value values)
                        (delv value values))))
-
+
 ;;; Misc
 
 (define (direction? object)
@@ -248,7 +248,7 @@
 
 (define (flip-coin bias)
   (n:>= (random 1.0) bias))
-
+
 ;;; Base object type
 
 (define object:name
@@ -287,7 +287,7 @@
                                                    ((instance-data-binding property
                                                                            instance-data))))
                                            (instance-data-properties instance-data)))))
-
+
 ;;; Messaging
 
 (define send-message!
@@ -328,7 +328,7 @@
   (if debug-output
     (set! debug-output #f))
   unspecific)
-
+
 (define (display-message message port)
   (guarantee message? message 'display-message)
   (if (pair? message)
@@ -372,7 +372,7 @@
                                   (match-args message? screen?)
                                   (lambda (message screen)
                                     (display-message message (get-port screen))))
-
+
 ;;; Clock
 
 (define (make-clock)

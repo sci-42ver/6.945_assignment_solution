@@ -50,7 +50,7 @@
 
 (define chars-needing-quoting-in-brackets
   '(#\] #\^ #\-))
-
+
 ;;; Means of combination for patterns
 
 (define (r:seq . exprs)
@@ -77,7 +77,7 @@
                      (make-list (- max min)
                                 (r:alt expr ""))
                      (list expr "*"))))))
-
+
 ;;; Using system's grep.
 (define (write-bourne-shell-grep-command expr filename)
   (display (bourne-shell-grep-command-string expr filename)))
@@ -143,7 +143,7 @@
                     (cons (substring string i j) lines))
               (cons (substring string i end) lines)))
           lines)))))
-
+
 #|
 ;;; For example...
 
@@ -182,7 +182,7 @@
           "tests.txt"))
 ("[09]. catdogcat" "[10]. catcatdogdog" "[11]. dogdogcatdogdog")
 ;Unspecified return value
-
+
 (pp
   (r:grep
     (let ((digit 

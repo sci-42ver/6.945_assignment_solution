@@ -21,7 +21,7 @@
         ((has-element?) has-element?)
         ((add-element!) add-element!)
         (else (error "Unknown operator:" operator))))))
-
+
 (define (make-alist-store key=?)
   (let ((alist '()))
 
@@ -64,7 +64,7 @@
         ((get-matching) get-matching)
         ((put!) put!)
         (else (error "Unknown operator:" operator))))))
-
+
 (define (make-hash-table-store make-table)
   (let ((table (make-table)))
 

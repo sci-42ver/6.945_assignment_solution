@@ -23,7 +23,7 @@
 
 (define (get-clock)
   the-clock)
-
+
 ;;; User interface
 
 (define (go direction)
@@ -79,7 +79,7 @@
     ((not (n:< i ticks)))
     (tick! (get-clock)))
   unspecific)
-
+
 ;;; Support for UI
 
 (define (here)
@@ -193,7 +193,7 @@
           tunnel 32-123 32D 32G
           student-street bldg-54 the-dot
           dorm-row)))
-
+
 (define (create-people places)
   (append (create-students places)
           (create-house-masters places)
@@ -222,7 +222,7 @@
                        (random-bias 3)
                        (random-bias 3)))
        '(grendel registrar)))
-
+
 (define (create-thing name location)
   (make-thing 'name name
               'location location))

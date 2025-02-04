@@ -41,7 +41,7 @@
 
 (define list-memoizer (make-list-memoizer make-list= #f))
 (define lset-memoizer (make-list-memoizer make-lset= #t))
-
+
 (define (make-simple-list-memoizer list-memoizer)
   (lambda (elt= elt-hash get-key get-datum)
     (let ((memoizer

@@ -20,7 +20,7 @@
 
 (define (restriction-error value predicate)
   (error "Value doesn't fit predicate:" value predicate))
-
+
 ;;;; Applicable objects
 
 (define applicable-object?)
@@ -80,7 +80,7 @@
   (if (applicable-object? object)
     (applicable-object->object object)
     object))
-
+
 ;;;; Unions of objects
 
 (define (object-union . components)
@@ -155,7 +155,7 @@
 (define-generic-procedure-handler equal*?
                                   (match-args object-union? object-union?)
                                   object-union=)
-
+
 ;;;; Various debugging tools for tagged data
 
 (define (pt object)

@@ -48,7 +48,7 @@
                (newline port))))
 
 (define trace-generic-dispatch? #f)
-
+
 (define (get-generic-procedure-handler metadata args)
   (or ((generic-metadata-getter metadata) args)
       ((generic-metadata-default-getter metadata))))
@@ -80,7 +80,7 @@
 
 (define (generic-procedure-handlers proc)
   (map cdr (generic-procedure-rules proc)))
-
+
 ;;;; Metadata
 
 (define-record-type <generic-metadata>
@@ -140,7 +140,7 @@
         ((set-default-handler!) set-default-handler!)
         ((get-rules) (lambda () rules))
         (else (error "Unknown message:" message))))))
-
+
 (define (trie-generic-dispatcher)
   (let ((base-dispatcher (simple-generic-dispatcher))
         (trie (make-trie)))

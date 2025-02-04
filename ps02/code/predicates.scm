@@ -40,7 +40,7 @@
   (call-with-output-string
     (lambda (port)
       (write object port))))
-
+
 (define (is-list-of predicate)
   (guarantee predicate? predicate)
   (register-compound-predicate! (lambda (object)
@@ -92,7 +92,7 @@
                                          predicates))
                                 'conjoin
                                 predicates))
-
+
 (define (equality-predicate-maker name =)
   (lambda (object)
     (let ((predicate

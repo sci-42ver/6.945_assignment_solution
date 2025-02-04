@@ -45,7 +45,7 @@
      ;; Assumes that separator is followed by one space.
      (* (+ (string-length (compound-token-separator-string token)) space-width)
         (- (length (compound-token-contents token)) 1))))
-
+
 (define (token? object)
   (or (simple-token? object)
       (compound-token? object)))
@@ -88,7 +88,7 @@
   (with-string-output-port
     (lambda (port)
       (write object port))))
-
+
 (define-generic-procedure-handler tokenize (match-args null?)
                                   (lambda (n)
                                     (make-compound-token "(" ")" "" '())))
@@ -135,7 +135,7 @@
                 (+ (token-width token*)
                    (string-length (compound-token-separator-string token))))
               (except-last-pair subtokens))))
-
+
 (define (print-token token cursor)
   (if (or (simple-token? token)
           (= (compound-token-length token) 0)
@@ -186,7 +186,7 @@
                                                   (print-separator token cursor)))
               (cdr subtokens))
         (print-close token cursor)))))
-
+
 (define-record-type <cursor>
   (%make-cursor row column port)
   cursor?

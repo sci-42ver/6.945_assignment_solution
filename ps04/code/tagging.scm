@@ -16,7 +16,7 @@
 (define-generic-procedure-default-handler get-data
                                           (lambda (object)
                                             object))
-
+
 ;;;; Tagged data
 
 (define-record-type <tagged-data>
@@ -82,7 +82,7 @@
                                      generic
                                      (and (eq? (car tags) tag)
                                           tagged-data-description))))
-
+
 ;;;; Tagging strategies
 
 (define (tagging-strategy:never name data-test make-tag)

@@ -31,7 +31,7 @@
 ;;; API
 (define (operation-components operation)
   (list operation))
-
+
 ;;; API
 (define (constant-union name . constants)
   (let ((unique

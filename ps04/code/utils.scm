@@ -89,7 +89,7 @@
       (let ((value (get-value)))
         (hash-table-set! table key value)
         value)))
-
+
 ;;;; List utilities
 
 (define (non-empty-list? object)
@@ -141,7 +141,7 @@
                               partitions))))))
               objects)
     partitions))
-
+
 ;;; MIT/GNU Scheme implementation specific:
 
 (define (implementation-type-name object)
@@ -181,12 +181,12 @@
   (if (default-object? modulus)
     (eqv-hash object)
     (eqv-hash-mod object modulus)))
-
+
 (define (save-environment! name environment)
   ;; A hook to use if we want to keep track of
   ;; loaded environments.  Called by the loader.
   name)
-
+
 (define load-quietly
   (cond ((environment-bound? system-global-environment
                              'param:suppress-loading-message?)

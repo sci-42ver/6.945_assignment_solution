@@ -82,7 +82,7 @@
 (set-predicate<=! real? complex?)
 
 (register-predicate! procedure? 'procedure)
-
+
 ;;;; Implementation tags
 
 (define implementation-tag

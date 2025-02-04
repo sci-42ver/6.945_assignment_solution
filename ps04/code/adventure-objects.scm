@@ -28,7 +28,7 @@
                                   (match-args message? thing?)
                                   (lambda (message thing)
                                     unspecific))
-
+
 ;;; Containers
 
 (define container:things
@@ -48,7 +48,7 @@
 
 (define remove-thing!
   (property-remover container:things container? thing?))
-
+
 ;;; Exits
 
 (define exit:from
@@ -83,7 +83,7 @@
                                   (lambda (super exit)
                                     (super exit)
                                     (add-exit! (get-from exit) exit)))
-
+
 ;;; Places
 
 (define place:vistas
@@ -116,7 +116,7 @@
 
 (define add-exit!
   (property-adder place:exits place? exit?))
-
+
 (define (find-exit-in-direction direction place)
   (find (lambda (exit)
           (eqv? (get-direction exit) direction))
@@ -142,7 +142,7 @@
                                     (for-each (lambda (person)
                                                 (send-message! message person))
                                               (people-in-place place))))
-
+
 ;;; Mobile things
 
 (define mobile-thing:origin
@@ -174,7 +174,7 @@
 
 (define-generic-procedure-default-handler leave-place!
                                           (lambda (mobile-thing) #f))
-
+
 ;;; People
 
 (define person:health
@@ -224,7 +224,7 @@
   (lambda (person)
     (if (n:> (get-health person) 0)
       (callback person))))
-
+
 (define (people-here person)
   (delv person (people-in-place (get-location person))))
 
@@ -260,7 +260,7 @@
   (guarantee n:exact-positive-integer? health)
   (set-health! person health)
   (move! person (get-origin person) person))
-
+
 ;;; Bags
 
 (define bag:holder
@@ -281,7 +281,7 @@
 
 (define set-holder!
   (property-setter bag:holder bag? person?))
-
+
 ;;; Autonomous people (non-player characters)
 
 (define autonomous-agent:restlessness
@@ -317,7 +317,7 @@
                                   (lambda (super agent)
                                     (unregister-with-clock! agent (get-clock))
                                     (super agent)))
-
+
 (define (move-and-take-stuff! agent)
   ;; to notify avatar for possible unknown states, e.g. president and troll may be at the same place.
   (displayln (list (get-name agent) "will move-and-take-stuff"))
@@ -339,7 +339,7 @@
       (take-thing! thing agent))))
 
 (define-clock-handler autonomous-agent? move-and-take-stuff!)
-
+
 ;;; Students
 
 (define student?
@@ -348,7 +348,7 @@
 
 (define make-student
   (type-instantiator student?))
-
+
 ;;; House masters
 
 (define house-master:irritability
@@ -388,7 +388,7 @@
               '("I'll let you off this once..."))))))
 
 (define-clock-handler house-master? irritate-students!)
-
+
 ;;; Trolls
 
 (define troll:hunger
@@ -445,7 +445,7 @@
                                     (super avatar)
                                     (look-around avatar)
                                     (tick! (get-clock))))
-
+
 (define (look-around avatar)
   (tell! (list "You are in" (get-location avatar))
          avatar)
@@ -470,7 +470,7 @@
              '("There are no exits..."
                "you are dead and gone to heaven!")))
          avatar))
-
+
 ;;; Motion
 
 (define (take-thing! thing person)
@@ -503,7 +503,7 @@
                                   (lambda (thing from to actor)
                                     (tell! (list thing "is not movable")
                                            actor)))
-
+
 ;; coderef: generic-move:steal
 (define-generic-procedure-handler generic-move!
                                   (match-args mobile-thing? bag? bag? person?)
@@ -554,7 +554,7 @@
                                       (if (not (eqv? actor new-holder))
                                         (say! new-holder (list "Whoa! Thanks, dude!")))
                                       (move-internal! mobile-thing from to))))
-
+
 ;; coderef: generic-move:drop
 (define-generic-procedure-handler generic-move!
                                   (match-args mobile-thing? bag? place? person?)
@@ -586,7 +586,7 @@
                                                          mobile-thing
                                                          "without carrying it?")
                                                    actor)))))
-
+
 ;; coderef: generic-move:person
 (define-generic-procedure-handler generic-move!
                                   (match-args person? place? place? person?)

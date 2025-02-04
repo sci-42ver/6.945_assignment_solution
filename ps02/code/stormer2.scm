@@ -35,7 +35,7 @@
           (evolve (step history) (n:- n-steps 1))
           history))
       evolve)))
-
+
 #|
 ;;; Here are some simple examples.
 
@@ -82,7 +82,7 @@
             (* -2 (negate xt-h)))
          (negate xt-2h))))
 |#
-
+
 (pp (x 0
        ((evolver F 'h stormer-2)
         (make-initial-history 't 'h 4 'xt-h 'xt-2h)

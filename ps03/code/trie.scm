@@ -50,7 +50,7 @@
                         tries)
             (cdr features))
       tries)))
-
+
 (define (apply-predicate predicate feature)
   (increment-predicate-count! predicate)
   (predicate feature))
@@ -86,7 +86,7 @@
       (if (trie-has-value? trie)
         (succeed (trie-value trie) fail)
         (fail)))))
-
+
 (define (%find-all-edges trie feature)
   (map cdr
        (filter (lambda (p)
@@ -109,7 +109,7 @@
   (if (apply-predicate (car edge) feature)
     (succeed (cdr edge) fail)
     (fail)))
-
+
 #|
 ;;; For example...
 ;;;                      a-trie
@@ -138,7 +138,7 @@
 (define e (add-edge-to-trie a-trie even-number?))
 
 (define sn (add-edge-to-trie s number?))
-
+
 (define ss (add-edge-to-trie s symbol?))
 
 (set-trie-value! s '(symbol))

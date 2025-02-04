@@ -67,7 +67,7 @@
             (optional #\^)
             (optional #\-))))
 
-
+
 ;;; Means of combination for patterns
 
 ;; addition based on code base.
