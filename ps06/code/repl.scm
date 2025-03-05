@@ -39,11 +39,13 @@
 (define the-global-environment 'not-initialized)
 
 (define (init)
+  ;; does same as code base but lacking abstraction
   (set! the-global-environment
     (extend-environment '() '() the-empty-environment))
   (repl))
 
 (define (repl)
+  ;; does same as code base but lacking abstraction
   (if (eq? the-global-environment 'not-initialized)
     (error "Interpreter not initialized. Run (init) first."))
   (let ((input (read)))

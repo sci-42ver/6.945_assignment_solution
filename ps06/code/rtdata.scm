@@ -63,6 +63,7 @@ http://groups.csail.mit.edu/mac/projects/scheme/documentation/scheme_11.html#SEC
 
 (define the-empty-environment (list '*the-empty-environment*))
 
+;; same as code base
 (define (lookup-variable-value var env)
   (let plp ((env env))
     (if (eq? env the-empty-environment)
@@ -76,6 +77,8 @@ http://groups.csail.mit.edu/mac/projects/scheme/documentation/scheme_11.html#SEC
 
 ;;; Extension to make underlying Scheme values available to interpreter
 
+;; see SDF_exercises/chapter_5/tests/env_misc.scm
+;; IMHO better to use the code base one due to readability
 (define (lookup-scheme-value var)
   (lexical-reference generic-evaluation-environment var))
 

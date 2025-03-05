@@ -15,14 +15,16 @@
 ;;; a recent change to MIT/GNU system fluid variables, and this must
 ;;; work in multiple versions.  Sorry!
 
-(if (or (not *unparser-list-depth-limit*)
-        (number? *unparser-list-depth-limit*))
-  (begin
-    (set! *unparser-list-depth-limit* 10)
-    (set! *unparser-list-breadth-limit* 10)
-    )
-  (begin
-    (set-fluid! *unparser-list-depth-limit* 10)
-    (set-fluid! *unparser-list-breadth-limit* 10)
-    ))
+;; This can be done by using write instead of display.
+
+; (if (or (not *unparser-list-depth-limit*)
+;         (number? *unparser-list-depth-limit*))
+;   (begin
+;     (set! *unparser-list-depth-limit* 10)
+;     (set! *unparser-list-breadth-limit* 10)
+;     )
+;   (begin
+;     (set-fluid! *unparser-list-depth-limit* 10)
+;     (set-fluid! *unparser-list-breadth-limit* 10)
+;     ))
 

@@ -1,4 +1,5 @@
-(load "/Users/blake/Dropbox (MIT)/Classes/6.945/ps06/code/load")
+; (load "/Users/blake/Dropbox (MIT)/Classes/6.945/ps06/code/load")
+(load "~/SICP_SDF/6.945_assignment_solution/ps06/code/load")
 
 #|
 Problem 1
@@ -43,6 +44,12 @@ Problem 3
             (lambda (expression environment)
               (call-with-current-continuation
                 (lambda (cont)
+                  ;; 0. https://www.gnu.org/software/mit-scheme/documentation/stable/mit-scheme-ref/Condition-Handling.html#index-bind_002dcondition_002dhandler-2
+                  ;; > By special extension, if condition-types is the empty list then the handler is called for *all conditions*.
+                  ;; IMHO better to be more specific as SDF_exercises/chapter_5/5_1.scm does.
+                  ;; 1. What is Condition?
+                  ;; http://gnu.org/software/mit-scheme/documentation/stable/mit-scheme-ref/Condition-Signalling.html#index-signal_002dcondition-1
+                  ;; > For example, a condition instance could be returned as the value of a procedure, indicating that *something unusual* has happened
                   (bind-condition-handler
                     '()
                     (lambda (e)
@@ -53,6 +60,7 @@ Problem 3
 (define (disjoin . predicates)
   (disjoin* predicates))
 
+;; compared with SDF_exercises/software/sdf/common/predicates.scm, no register.
 (define (disjoin* predicates)
   ;  (guarantee-list-of predicate? predicates)
   (lambda (object)
@@ -66,6 +74,8 @@ Problem 3
 (define n:+ +)
 (define n:- -)
 
+;; (disjoin variable? list?) is similar to symbolic?.
+;; So this is already done in symbolic-extender which is more elegant.
 (define * (make-generic-operator 2 '* n:*))
 (defhandler * (lambda (x y) `(* ,x ,y)) (disjoin variable? list?) number?)
 (defhandler * (lambda (x y) `(* ,x ,y)) number? (disjoin variable? list?))
@@ -93,6 +103,7 @@ Problem 3
 (defhandler apply
             (lambda (procedure-name operands calling-environment)
               (cons procedure-name operands))
+            ;; different from code base due to allowing only specifying *less* predicates.
             symbol?)
 
 #|
@@ -110,6 +121,7 @@ eval> (+ (f 3) (* 4 5))
 ;; Now, to allow these extensions only if the user sets the value ALLOW-SELF-EVALUATING-SYMBOLS to #t:
 
 (define (init)
+  ;; better than SDF_exercises/chapter_5/5_1.scm to define inside this customized interpreter.
   (set! the-global-environment
     (extend-environment '(ALLOW-SELF-EVALUATING-SYMBOLS) '(#f) the-empty-environment))
   (repl))
@@ -131,13 +143,16 @@ eval> (+ (f 3) (* 4 5))
                         ))))))
             variable?)
 
+;; no need for changes due to that when ALLOW-SELF-EVALUATING-SYMBOLS is not allowed, procedure-name will be "lookup"ed when eval and failed already.
 (defhandler apply
             (lambda (procedure-name operands calling-environment)
               (if (not (lookup-variable-value 'ALLOW-SELF-EVALUATING-SYMBOLS calling-environment))
+                ;; same as the signalling conventions of DEFINE etc.
                 (error (string-append "Unbound variable:" (symbol->string procedure-name)))
                 (cons procedure-name operands)))
             symbol?)
 
+;; (go) meaning: see 6.945_assignment_solution/ps06/code/repl.scm.
 
 #| Tests:
 
